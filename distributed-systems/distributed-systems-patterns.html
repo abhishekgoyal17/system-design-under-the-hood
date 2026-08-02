@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributed Systems &amp; Backend Patterns — The Complete Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F5F0; --paper-2:#ECEEE7; --ink:#181C22; --ink-soft:#565F6B; --line:#D8DBD1;
+    --panel:#171B22; --panel-2:#20252E; --panel-text:#E9EBEE;
+    --red:#C7454A; --red-bg:#F7E4E3; --amber:#C8862B; --amber-bg:#F6E9D3;
+    --green:#2F8F63; --green-bg:#DDEFE4; --blue:#2C5FD1; --blue-bg:#DFE6F9;
+    --purple:#7A54C9; --purple-bg:#EAE2F7;
+    --radius:10px; --maxw:760px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'Source Serif 4', Georgia, serif; font-size:18px; line-height:1.65; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4,.eyebrow,nav,.chip{font-family:'Space Grotesk', sans-serif;}
+  code, pre, .cheat-table td, .cheat-table th{font-family:'IBM Plex Mono', monospace;}
+  a{color:var(--blue);} a:hover{color:var(--ink);}
+
+  .signal{display:inline-flex; gap:5px; align-items:center;}
+  .signal span{width:9px;height:9px;border-radius:50%;display:inline-block; box-shadow:0 0 0 1px rgba(0,0,0,.08) inset;}
+  .signal .r{background:var(--red);} .signal .a{background:var(--amber);} .signal .g{background:var(--green);}
+
+  .topnav{position:sticky; top:0; z-index:50; background:rgba(244,245,240,.88); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:14px 24px; display:flex; align-items:center; justify-content:space-between;}
+  .topnav .brand{font-weight:600; font-size:14px; display:flex; gap:8px; align-items:center; color:var(--ink); text-decoration:none;}
+  .topnav a.back{font-size:14px; text-decoration:none; color:var(--ink-soft); font-family:'Space Grotesk',sans-serif;}
+  .topnav a.back:hover{color:var(--ink);}
+
+  .hero{background:var(--panel); color:var(--panel-text); padding:88px 24px 76px; position:relative; overflow:hidden;}
+  .hero-inner{max-width:var(--maxw); margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{text-transform:uppercase; font-size:12.5px; letter-spacing:.16em; color:#9AA3B0; font-weight:600; margin-bottom:22px; display:flex; align-items:center; gap:10px;}
+  .hero h1{font-size:40px; line-height:1.14; font-weight:700; margin:0 0 22px; letter-spacing:-0.01em; max-width:15em;}
+  .hero .dek{font-family:'Source Serif 4', serif; font-size:19px; line-height:1.6; color:#C4C9D2; max-width:38em; margin:0 0 30px;}
+  .byline{font-family:'Space Grotesk',sans-serif; font-size:13.5px; color:#8B93A0; display:flex; gap:18px; flex-wrap:wrap; align-items:center;}
+  .byline strong{color:#D7DAE1; font-weight:600;}
+  .hero-graphic{position:absolute; right:-60px; top:50%; transform:translateY(-50%); width:320px; height:320px; opacity:.9; z-index:1;}
+  @media (max-width:900px){ .hero-graphic{display:none;} }
+
+  .layout{max-width:1180px; margin:0 auto; padding:56px 24px 100px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+  @media (max-width:980px){ .layout{grid-template-columns:1fr; padding:40px 20px 80px;} .toc{display:none;} }
+  .toc{position:sticky; top:76px; align-self:start; font-family:'Space Grotesk',sans-serif; font-size:12.5px; max-height:calc(100vh - 100px); overflow-y:auto;}
+  .toc .toc-label{text-transform:uppercase; letter-spacing:.12em; font-size:11px; color:var(--ink-soft); font-weight:600; margin-bottom:14px;}
+  .toc .toc-cat{text-transform:uppercase; letter-spacing:.08em; font-size:10.5px; color:var(--ink-soft); font-weight:700; margin:16px 0 4px;}
+  .toc ol{list-style:none; margin:0; padding:0; border-left:1px solid var(--line);}
+  .toc a{display:block; padding:4px 0 4px 16px; color:var(--ink-soft); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; transition:color .15s, border-color .15s;}
+  .toc a:hover{color:var(--ink); border-left-color:var(--line);}
+  .toc a.active{color:var(--ink); border-left-color:var(--blue); font-weight:600;}
+
+  article{max-width:var(--maxw);}
+  article h2{font-size:26px; font-weight:700; margin:64px 0 6px; letter-spacing:-0.005em; scroll-margin-top:84px; display:flex; align-items:center;}
+  article h2 .num{color:var(--ink-soft); font-weight:500; margin-right:10px; font-size:.7em;}
+  article h3{font-size:19px; font-weight:600; margin:34px 0 10px; scroll-margin-top:84px;}
+  article h4{font-size:14.5px; font-weight:700; margin:22px 0 8px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);}
+  article p{margin:0 0 18px;}
+  article ul, article ol{margin:0 0 18px; padding-left:22px;}
+  article li{margin-bottom:6px;}
+  .section-intro{color:var(--ink-soft); font-size:17px;}
+  .cat-divider{margin:88px 0 0; padding-top:24px; border-top:3px solid var(--ink);}
+  .cat-divider .cat-label{font-family:'Space Grotesk',sans-serif; text-transform:uppercase; letter-spacing:.14em; font-size:12.5px; color:var(--ink-soft); font-weight:700; display:flex; align-items:center; gap:10px;}
+
+  strong{font-weight:600;}
+  code{background:var(--paper-2); border:1px solid var(--line); border-radius:4px; padding:1.5px 6px; font-size:.85em; color:#1F3A93;}
+  pre{background:var(--panel); color:var(--panel-text); border-radius:var(--radius); padding:18px 20px; overflow-x:auto; font-size:13.2px; line-height:1.6; margin:22px 0;}
+  pre code{background:none; border:none; padding:0; color:inherit; font-size:1em;}
+  .pre-label{font-family:'Space Grotesk',sans-serif; font-size:11.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin:26px 0 -8px;}
+
+  blockquote{margin:22px 0; padding:14px 20px; border-left:3px solid var(--blue); background:var(--blue-bg); border-radius:0 8px 8px 0; font-size:16.5px; color:#1B2A4D;}
+  blockquote p{margin:0;}
+
+  .callout{border:1px solid var(--line); background:#fff; border-radius:var(--radius); padding:22px 24px; margin:26px 0;}
+  .callout-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .callout.green{border-color:#BFDECB; background:var(--green-bg);} .callout.green .callout-title{color:#1F6B47;}
+  .callout.amber{border-color:#E7CE9E; background:var(--amber-bg);} .callout.amber .callout-title{color:#8C5E13;}
+  .callout.red{border-color:#E9BFC0; background:var(--red-bg);} .callout.red .callout-title{color:#8E2E32;}
+  .callout.blue{border-color:#C3D2F5; background:var(--blue-bg);} .callout.blue .callout-title{color:#1F3A93;}
+  .callout.purple{border-color:#D3C2EC; background:var(--purple-bg);} .callout.purple .callout-title{color:#4E3080;}
+
+  figure.diagram{margin:28px 0 32px; padding:22px 20px 16px; background:#fff; border:1px solid var(--line); border-radius:var(--radius);}
+  figure.diagram svg{width:100%; height:auto; display:block;}
+  figure.diagram figcaption{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--ink-soft); margin-top:10px; text-align:center;}
+
+  .tablewrap{overflow-x:auto; margin:22px 0;}
+  table{border-collapse:collapse; width:100%; font-size:14.5px;}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--paper-2); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
+  td.center, th.center{text-align:center;}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+  .dot.r{background:var(--red);} .dot.a{background:var(--amber);} .dot.g{background:var(--green);} .dot.b{background:var(--blue);} .dot.p{background:var(--purple);}
+
+  .chip{display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.02em;}
+  .chip.g{background:var(--green-bg); color:#1F6B47;} .chip.a{background:var(--amber-bg); color:#8C5E13;}
+  .chip.r{background:var(--red-bg); color:#8E2E32;} .chip.b{background:var(--blue-bg); color:#1F3A93;} .chip.p{background:var(--purple-bg); color:#4E3080;}
+
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0;}
+  @media (max-width:640px){ .cards{grid-template-columns:1fr;} }
+  .card{border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; background:#fff;}
+  .card h4{margin:0 0 4px; font-family:'Space Grotesk',sans-serif; font-size:15.5px; font-weight:700; text-transform:none; letter-spacing:0; color:var(--ink);}
+  .card .sub{color:var(--ink-soft); font-size:13px; margin-bottom:12px; font-family:'Space Grotesk',sans-serif;}
+  .card ul{padding-left:18px; margin:0; font-size:14.5px;}
+  .card li{margin-bottom:5px;}
+  .card p{font-size:14.5px; margin:0;}
+
+  .modebadge{display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--panel); color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; margin-right:12px; flex:none;}
+
+  .qa{border:1px solid var(--line); border-radius:var(--radius); background:#fff; padding:18px 20px; margin:16px 0;}
+  .qa .q{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15.5px; margin-bottom:8px; color:var(--ink);}
+  .qa .a{font-size:15.5px; margin:0;}
+  .qa .a p{margin:0 0 10px;}
+  .qa .a p:last-child{margin-bottom:0;}
+
+  .cheat{background:var(--panel); color:var(--panel-text); border-radius:var(--radius); padding:8px; margin:28px 0;}
+  .cheat-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .cheat-table td, .cheat-table th{border:1px solid #333A45; padding:10px 12px; text-align:left;}
+  .cheat-table th{background:var(--panel-2); color:#B9C0CC; font-weight:600;}
+
+  .overview-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:30px 0 48px;}
+  @media (max-width:900px){ .overview-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:640px){ .overview-grid{grid-template-columns:1fr;} }
+  .ov-card{border:1px solid var(--line); border-radius:8px; padding:16px 18px; background:#fff; text-decoration:none; display:block; transition:border-color .15s, transform .15s;}
+  .ov-card:hover{border-color:var(--ink); transform:translateY(-1px);}
+  .ov-card .ov-cat{font-family:'Space Grotesk',sans-serif; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:6px;}
+  .ov-card .ov-count{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--ink);}
+  .ov-card .ov-desc{font-family:'Space Grotesk',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+
+  hr.rule{border:none; border-top:1px solid var(--line); margin:56px 0;}
+  footer{max-width:var(--maxw); margin:0 auto; padding:0 24px 90px; font-size:14px; color:var(--ink-soft);}
+  footer a{color:var(--ink-soft); text-decoration:underline;}
+  .ref-group{margin-top:20px;}
+  .ref-group .group-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink); margin-bottom:8px;}
+  .ref-group ul{padding-left:18px; margin:0;}
+  .ref-group li{margin-bottom:5px;}
+
+  ::selection{background:#CFE0FF;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="../index.html">
+    <span class="signal"><span class="r"></span><span class="a"></span><span class="g"></span></span>
+    System Notes
+  </a>
+  <a class="back" href="../index.html">← All guides</a>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">
+      <span class="signal"><span class="r"></span><span class="a"></span><span class="g"></span></span>
+      Backend&nbsp;/&nbsp;Distributed&nbsp;Systems&nbsp;&amp;&nbsp;Scalability
+    </div>
+    <h1>Distributed Systems &amp; Backend Patterns, End to End</h1>
+    <p class="dek">50+ patterns that keep production systems alive under failure, load, and scale — resilience, load management, caching, messaging, databases, distributed coordination, traffic routing, reliability, scalability, security, and observability. Every pattern with the problem it solves, a diagram, real code, and the trade-off nobody puts on the slide.</p>
+    <div class="byline">
+      <span><strong>Read time</strong> ~90 min</span>
+      <span><strong>Level</strong> Intermediate → Advanced</span>
+      <span><strong>Patterns</strong> 60+</span>
+    </div>
+  </div>
+  <svg class="hero-graphic" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="160" cy="160" r="8" fill="#C7454A"/>
+    <circle cx="80" cy="80" r="6" fill="#2F8F63" stroke="#2A3040"/>
+    <circle cx="240" cy="80" r="6" fill="#2F8F63" stroke="#2A3040"/>
+    <circle cx="80" cy="240" r="6" fill="#2F8F63" stroke="#2A3040"/>
+    <circle cx="240" cy="240" r="6" fill="#2F8F63" stroke="#2A3040"/>
+    <circle cx="160" cy="50" r="6" fill="#C8862B" stroke="#2A3040"/>
+    <circle cx="160" cy="270" r="6" fill="#C8862B" stroke="#2A3040"/>
+    <path d="M160,160 L80,80 M160,160 L240,80 M160,160 L80,240 M160,160 L240,240 M160,160 L160,50 M160,160 L160,270" stroke="#2A3040" stroke-width="1.2"/>
+  </svg>
+</header>
+
+<div class="layout">
+  <nav class="toc" id="toc">
+    <div class="toc-label">On this page</div>
+    <div class="toc-cat">Resilience</div>
+    <ol>
+      <li><a href="#backoff">Exponential Backoff</a></li>
+      <li><a href="#circuit-breaker">Circuit Breaker</a></li>
+      <li><a href="#retry">Retry Pattern</a></li>
+      <li><a href="#timeout">Timeout Pattern</a></li>
+      <li><a href="#bulkhead">Bulkhead</a></li>
+      <li><a href="#fail-fast">Fail Fast</a></li>
+      <li><a href="#fallback">Fallback</a></li>
+      <li><a href="#hedged">Hedged Requests</a></li>
+      <li><a href="#dlq">Dead Letter Queue</a></li>
+    </ol>
+    <div class="toc-cat">Load Management</div>
+    <ol>
+      <li><a href="#rate-limiting">Rate Limiting</a></li>
+      <li><a href="#token-bucket">Token Bucket</a></li>
+      <li><a href="#leaky-bucket">Leaky Bucket</a></li>
+      <li><a href="#sliding-window">Sliding Window</a></li>
+      <li><a href="#queue-leveling">Queue-Based Load Leveling</a></li>
+      <li><a href="#backpressure">Backpressure</a></li>
+      <li><a href="#load-shedding">Load Shedding</a></li>
+      <li><a href="#priority-queue">Priority Queue</a></li>
+    </ol>
+    <div class="toc-cat">Caching</div>
+    <ol>
+      <li><a href="#cache-aside">Cache Aside</a></li>
+      <li><a href="#read-write-through">Read/Write Through</a></li>
+      <li><a href="#write-behind">Write Behind</a></li>
+      <li><a href="#cache-stampede">Cache Stampede Prevention</a></li>
+      <li><a href="#bloom-filter">Bloom Filter</a></li>
+      <li><a href="#hot-key">Hot Key Replication</a></li>
+    </ol>
+    <div class="toc-cat">Messaging</div>
+    <ol>
+      <li><a href="#pubsub">Publish/Subscribe</a></li>
+      <li><a href="#event-sourcing">Event Sourcing</a></li>
+      <li><a href="#cqrs">CQRS</a></li>
+      <li><a href="#saga">Saga Pattern</a></li>
+      <li><a href="#outbox">Outbox Pattern</a></li>
+      <li><a href="#idempotent-consumer">Idempotent Consumer</a></li>
+      <li><a href="#competing-consumers">Competing Consumers</a></li>
+    </ol>
+    <div class="toc-cat">Database</div>
+    <ol>
+      <li><a href="#sharding">Sharding</a></li>
+      <li><a href="#read-replicas">Read Replicas</a></li>
+      <li><a href="#consistent-hashing">Consistent Hashing</a></li>
+      <li><a href="#materialized-views">Materialized Views</a></li>
+      <li><a href="#optimistic-pessimistic">Optimistic vs Pessimistic Locking</a></li>
+    </ol>
+    <div class="toc-cat">Distributed Systems</div>
+    <ol>
+      <li><a href="#leader-election">Leader Election</a></li>
+      <li><a href="#service-discovery">Service Discovery</a></li>
+      <li><a href="#heartbeat">Heartbeat</a></li>
+      <li><a href="#gossip">Gossip Protocol</a></li>
+      <li><a href="#distributed-lock">Distributed Lock</a></li>
+      <li><a href="#2pc-3pc">Two/Three Phase Commit</a></li>
+      <li><a href="#quorum">Quorum Reads/Writes</a></li>
+      <li><a href="#consensus">Consensus (Raft/Paxos)</a></li>
+      <li><a href="#vector-clocks">Vector Clocks</a></li>
+    </ol>
+    <div class="toc-cat">Traffic Routing</div>
+    <ol>
+      <li><a href="#load-balancer">Load Balancer</a></li>
+      <li><a href="#api-gateway">API Gateway</a></li>
+      <li><a href="#service-mesh">Service Mesh</a></li>
+      <li><a href="#blue-green">Blue-Green Deployment</a></li>
+      <li><a href="#canary">Canary Deployment</a></li>
+      <li><a href="#feature-flags">Feature Flags</a></li>
+    </ol>
+    <div class="toc-cat">Reliability</div>
+    <ol>
+      <li><a href="#idempotency">Idempotency</a></li>
+      <li><a href="#delivery-guarantees">Delivery Guarantees</a></li>
+      <li><a href="#checkpointing">Checkpointing &amp; Snapshotting</a></li>
+      <li><a href="#health-checks">Health Checks &amp; Watchdog</a></li>
+    </ol>
+    <div class="toc-cat">Scalability</div>
+    <ol>
+      <li><a href="#horiz-vert">Horizontal vs Vertical Scaling</a></li>
+      <li><a href="#stateless">Stateless Services</a></li>
+      <li><a href="#worker-pools">Worker &amp; Thread Pools</a></li>
+    </ol>
+    <div class="toc-cat">Security</div>
+    <ol>
+      <li><a href="#authn-authz">OAuth2, JWT, RBAC/ABAC</a></li>
+      <li><a href="#secrets-mtls">mTLS &amp; Secrets Management</a></li>
+    </ol>
+    <div class="toc-cat">Observability</div>
+    <ol>
+      <li><a href="#tracing">Distributed Tracing</a></li>
+      <li><a href="#logging-metrics">Structured Logging &amp; Metrics</a></li>
+    </ol>
+    <div class="toc-cat">Advanced</div>
+    <ol>
+      <li><a href="#advanced-patterns">Coalescing, Sidecar, Strangler Fig &amp; more</a></li>
+    </ol>
+    <ol style="margin-top:8px;">
+      <li><a href="#cheatsheet">Cheat sheet</a></li>
+      <li><a href="#resources">Resources</a></li>
+    </ol>
+  </nav>
+
+  <article>
+    <p class="section-intro">Every pattern below exists to answer one question: <em>what happens when the thing you're depending on doesn't work the way you assumed?</em> A dependency gets slow. A network partitions. A cache goes cold at the worst possible moment. Ten thousand requests arrive in the same second. Each pattern is a specific, named answer to one of those moments — and the patterns compose: a real production system runs a dozen of these simultaneously, layered on top of each other.</p>
+
+    <p>This guide groups them the way they actually get reached for — by the failure or bottleneck each one is defending against — then closes with a cheat sheet mapping symptom to pattern.</p>
+
+    <div class="cat-divider" id="resilience">
+      <div class="cat-label"><span class="dot r"></span>Category 1 — Resilience Patterns</div>
+    </div>
+    <h2><span class="num">§1</span>Resilience: surviving a dependency that's failing</h2>
+    <p class="section-intro">Resilience patterns share one premise: <strong>something you depend on will fail, and it will fail in the middle of your request.</strong> The goal isn't preventing that failure — you usually can't — it's making sure one failing dependency doesn't take your whole system down with it.</p>
+
+    <h3 id="backoff">Exponential Backoff</h3>
+    <p><strong>Solves:</strong> retry storms — a fleet of clients all retrying a failed call at the same instant, which is often what tips a struggling service over into an outage.</p>
+    <p>The idea is simple: each retry waits longer than the last, growing exponentially, so a client doesn't hammer a struggling service at a fixed interval. <code>delay = base * 2^attempt</code>. Without jitter, every client computes the exact same delay sequence and they all retry in lockstep anyway — <strong>jitter</strong> (a random offset added to each delay) is what actually breaks the synchronization.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="backoff-title">
+        <title id="backoff-title">Exponential backoff with jitter vs without</title>
+        <text x="20" y="24" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#565F6B">Without jitter — every client retries in lockstep</text>
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <rect x="20" y="34" width="18" height="18" fill="#C7454A"/><rect x="90" y="34" width="18" height="18" fill="#C7454A"/><rect x="220" y="34" width="18" height="18" fill="#C7454A"/><rect x="470" y="34" width="18" height="18" fill="#C7454A"/>
+          <rect x="20" y="58" width="18" height="18" fill="#C7454A"/><rect x="90" y="58" width="18" height="18" fill="#C7454A"/><rect x="220" y="58" width="18" height="18" fill="#C7454A"/><rect x="470" y="58" width="18" height="18" fill="#C7454A"/>
+          <rect x="20" y="82" width="18" height="18" fill="#C7454A"/><rect x="90" y="82" width="18" height="18" fill="#C7454A"/><rect x="220" y="82" width="18" height="18" fill="#C7454A"/><rect x="470" y="82" width="18" height="18" fill="#C7454A"/>
+        </g>
+        <text x="20" y="120" font-family="Space Grotesk" font-size="10" fill="#8E2E32">↑ all N clients retry at t=1s, t=2s, t=4s, t=8s — same spike, just delayed</text>
+
+        <text x="20" y="156" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#565F6B">With jitter — retries spread out, service recovers</text>
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <rect x="24" y="166" width="14" height="14" fill="#2F8F63"/><rect x="55" y="170" width="14" height="14" fill="#2F8F63"/><rect x="95" y="164" width="14" height="14" fill="#2F8F63"/>
+          <rect x="160" y="172" width="14" height="14" fill="#2F8F63"/><rect x="210" y="166" width="14" height="14" fill="#2F8F63"/><rect x="280" y="170" width="14" height="14" fill="#2F8F63"/>
+          <rect x="380" y="164" width="14" height="14" fill="#2F8F63"/><rect x="450" y="172" width="14" height="14" fill="#2F8F63"/><rect x="540" y="166" width="14" height="14" fill="#2F8F63"/>
+        </g>
+        <text x="20" y="200" font-family="Space Grotesk" font-size="10" fill="#1F6B47">↑ same N clients, randomized delay per client — load spreads over time</text>
+      </svg>
+      <figcaption>Same number of retries, same base delay — jitter is the only difference, and it's the difference between a self-inflicted second outage and a quiet recovery.</figcaption>
+    </figure>
+
+    <pre><code>def backoff_delay(attempt, base=1.0, cap=30.0):
+    exp = min(cap, base * (2 ** attempt))
+    return random.uniform(0, exp)   # "full jitter" -- AWS's recommended formula
+
+for attempt in range(max_retries):
+    try:
+        return call_service()
+    except TransientError:
+        time.sleep(backoff_delay(attempt))
+raise MaxRetriesExceeded()</code></pre>
+
+    <div class="callout amber">
+      <div class="callout-title"><span class="dot a"></span>Full jitter vs. equal jitter</div>
+      "Full jitter" (<code>random(0, cap)</code>) gives the best spread but means some retries fire almost immediately. "Equal jitter" (<code>cap/2 + random(0, cap/2)</code>) guarantees a minimum wait at the cost of a less even spread. AWS's own architecture blog recommends full jitter for most cases — the minor risk of an early retry is worth the better load distribution.
+    </div>
+
+    <h3 id="circuit-breaker">Circuit Breaker</h3>
+    <p><strong>Solves:</strong> cascading failures — a slow or dead downstream service causing every upstream caller to pile up threads waiting on it, until the caller itself runs out of resources and fails too.</p>
+    <p>Modeled directly on the electrical version: too many failures and the circuit "trips," and calls fail immediately without ever touching the struggling service — giving it room to recover instead of being hit by requests while it's already down.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cb-title">
+        <title id="cb-title">Circuit breaker's three states</title>
+        <defs><marker id="cb1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <rect x="30" y="30" width="160" height="56" rx="8" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="110" y="55" text-anchor="middle" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#1F6B47">CLOSED</text>
+        <text x="110" y="72" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#1F6B47">calls pass through</text>
+
+        <path d="M190,58 L280,58" stroke="#565F6B" stroke-width="1.4" marker-end="url(#cb1)"/>
+        <text x="235" y="46" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">failure rate</text>
+        <text x="235" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">&gt; threshold</text>
+
+        <rect x="280" y="30" width="160" height="56" rx="8" fill="#F7E4E3" stroke="#C7454A" stroke-width="1.5"/>
+        <text x="360" y="55" text-anchor="middle" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#8E2E32">OPEN</text>
+        <text x="360" y="72" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#8E2E32">calls fail instantly</text>
+
+        <path d="M440,58 L530,58" stroke="#565F6B" stroke-width="1.4" marker-end="url(#cb1)"/>
+        <text x="485" y="46" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">timeout</text>
+        <text x="485" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">elapses</text>
+
+        <rect x="530" y="30" width="150" height="56" rx="8" fill="#F6E9D3" stroke="#C8862B" stroke-width="1.5"/>
+        <text x="605" y="55" text-anchor="middle" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#8C5E13">HALF-OPEN</text>
+        <text x="605" y="72" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#8C5E13">1 test call allowed</text>
+
+        <path d="M605,86 L605,150 L190,150 L190,86" stroke="#2F8F63" stroke-width="1.4" fill="none" marker-end="url(#cb1)"/>
+        <text x="400" y="142" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#1F6B47">test call succeeds → back to CLOSED</text>
+
+        <path d="M605,86 L605,190 L360,190 L360,86" stroke="#C7454A" stroke-width="1.4" fill="none" marker-end="url(#cb1)"/>
+        <text x="480" y="182" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#8E2E32">test call fails → straight back to OPEN</text>
+
+        <text x="30" y="230" font-family="Space Grotesk" font-size="11" fill="#565F6B">HALF-OPEN is the whole point: it's how the breaker finds out the dependency</text>
+        <text x="30" y="248" font-family="Space Grotesk" font-size="11" fill="#565F6B">recovered without ever letting a full flood of traffic hit it to check.</text>
+      </svg>
+      <figcaption>Three states, and HALF-OPEN allows exactly one (or a small handful of) probe calls — never the full traffic volume — to test recovery.</figcaption>
+    </figure>
+
+    <pre><code>class CircuitBreaker:
+    def __init__(self, failure_threshold=5, reset_timeout=30):
+        self.state = "CLOSED"
+        self.failures = 0
+        self.failure_threshold = failure_threshold
+        self.reset_timeout = reset_timeout
+        self.opened_at = None
+
+    def call(self, fn, *args):
+        if self.state == "OPEN":
+            if time.time() - self.opened_at > self.reset_timeout:
+                self.state = "HALF_OPEN"
+            else:
+                raise CircuitOpenError()
+        try:
+            result = fn(*args)
+            self._on_success()
+            return result
+        except Exception:
+            self._on_failure()
+            raise
+
+    def _on_success(self):
+        self.failures = 0
+        self.state = "CLOSED"
+
+    def _on_failure(self):
+        self.failures += 1
+        if self.state == "HALF_OPEN" or self.failures >= self.failure_threshold:
+            self.state = "OPEN"
+            self.opened_at = time.time()</code></pre>
+
+    <div class="callout blue">
+      <div class="callout-title"><span class="dot b"></span>Circuit breaker vs. retry — they compose, in a specific order</div>
+      Retry answers "is this failure transient?" Circuit breaker answers "should I even try?" Wrap retry <em>inside</em> the breaker check, not the other way around — otherwise a breaker that's OPEN still gets hit by every retry attempt of every caller, defeating its entire purpose.
+    </div>
+
+    <h3 id="retry">Retry Pattern</h3>
+    <p><strong>Solves:</strong> transient failures — a blip, a dropped packet, a momentary overload — that would succeed if simply attempted again a moment later.</p>
+    <p>The pattern only makes sense for errors that are actually transient and for operations that are safe to repeat. Retrying a <code>500</code> from an idempotent <code>GET</code> is safe. Retrying a non-idempotent "charge this card" <code>POST</code> without a dedupe key can double-charge a customer — see the Idempotency pattern later in this guide before wiring retry onto anything that mutates state.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Error type</th><th>Retry?</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Network timeout, connection reset</td><td><span class="chip g">Yes</span></td><td>Genuinely transient</td></tr>
+          <tr><td>HTTP 503 / 429</td><td><span class="chip g">Yes</span></td><td>Server signaling temporary overload</td></tr>
+          <tr><td>HTTP 500 on a non-idempotent write</td><td><span class="chip a">Careful</span></td><td>Only with an idempotency key</td></tr>
+          <tr><td>HTTP 400 / 401 / 403</td><td><span class="chip r">No</span></td><td>The request itself is wrong — retrying won't fix it</td></tr>
+          <tr><td>HTTP 404</td><td><span class="chip r">No</span></td><td>Resource doesn't exist; retrying wastes a call</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="timeout">Timeout Pattern</h3>
+    <p><strong>Solves:</strong> hanging requests — a call with no timeout will wait forever for a dependency that will never respond, holding a thread and its resources hostage the entire time.</p>
+    <p>Every network call needs an explicit timeout — there is no safe default of "wait indefinitely." The harder part is picking the number: too short and you abort calls that would have succeeded; too long and a struggling dependency ties up your resources anyway, just more slowly.</p>
+    <div class="callout amber">
+      <div class="callout-title"><span class="dot a"></span>Budget timeouts across a call chain</div>
+      If service A calls B calls C, and each independently sets a 10-second timeout, a hang in C can cost A up to 30 seconds. Pass a shrinking deadline down the chain instead — A gives B a budget, B gives C whatever's left of that budget — so the whole chain fails together rather than compounding.
+    </div>
+
+    <h3 id="bulkhead">Bulkhead Pattern</h3>
+    <p><strong>Solves:</strong> failure isolation — one overwhelmed dependency exhausting the shared thread pool or connection pool that every other, unrelated dependency also relies on.</p>
+    <p>Named after ship design: watertight compartments mean one flooded section doesn't sink the whole vessel. In software, that means giving each downstream dependency its own dedicated pool of threads or connections, sized to that dependency's own risk and importance — so a slow, low-priority dependency can never starve the pool that a critical one depends on.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bulkhead-title">
+        <title id="bulkhead-title">Shared pool failure vs bulkheaded pools</title>
+        <text x="20" y="24" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#565F6B">Shared pool — one slow dependency starves everyone</text>
+        <rect x="20" y="34" width="300" height="50" rx="8" fill="#F7E4E3" stroke="#C7454A"/>
+        <text x="170" y="64" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#8E2E32">20 threads — all stuck waiting on slow Service C</text>
+        <text x="20" y="100" font-family="IBM Plex Mono" font-size="10" fill="#8E2E32">→ Service A and B calls now queue behind C's mess too</text>
+
+        <text x="380" y="24" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#565F6B">Bulkheaded — isolated per-dependency pools</text>
+        <rect x="380" y="34" width="90" height="50" rx="8" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="425" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">A pool</text>
+        <text x="425" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">8 threads</text>
+        <rect x="480" y="34" width="90" height="50" rx="8" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="525" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">B pool</text>
+        <text x="525" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">8 threads</text>
+        <rect x="580" y="34" width="90" height="50" rx="8" fill="#F7E4E3" stroke="#C7454A"/>
+        <text x="625" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#8E2E32">C pool</text>
+        <text x="625" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#8E2E32">4 threads</text>
+        <text x="380" y="100" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">→ C is fully saturated and failing; A and B are unaffected</text>
+      </svg>
+      <figcaption>Bulkheading trades some idle capacity (unused threads in A/B's pool while C's is slammed) for a hard guarantee that failures stay contained.</figcaption>
+    </figure>
+
+    <h3 id="fail-fast">Fail Fast</h3>
+    <p><strong>Solves:</strong> wasted resources spent on a request that's already known to be doomed — checking cheap, definitive failure conditions immediately rather than partway through expensive processing.</p>
+    <p>Validate inputs, check circuit breaker state, and check resource availability at the very top of a request handler, before acquiring any locks, opening any connections, or doing any real work. A request that's going to be rejected should be rejected in microseconds, not after it's already consumed a database connection.</p>
+
+    <h3 id="fallback">Fallback Pattern</h3>
+    <p><strong>Solves:</strong> graceful degradation — when a dependency is unavailable, returning something imperfect but useful is almost always better for the user than returning nothing.</p>
+    <div class="cards">
+      <div class="card">
+        <h4>Common fallback strategies</h4>
+        <ul>
+          <li>Serve stale cached data instead of a live, failed lookup</li>
+          <li>Return a sensible default (empty list, zero, "recommendations unavailable")</li>
+          <li>Degrade to a simpler algorithm (skip personalization, show generic results)</li>
+          <li>Queue the write for later instead of failing it outright</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Where it pairs naturally</h4>
+        <ul>
+          <li>Circuit breaker OPEN → fallback response instead of an error</li>
+          <li>Cache miss + origin down → stale-if-error from the cache</li>
+          <li>Recommendation service down → non-personalized "popular items"</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 id="hedged">Hedged Requests</h3>
+    <p><strong>Solves:</strong> tail latency — the small fraction of requests that hit an unusually slow replica or path, which dominate p99 latency even when the median is fine.</p>
+    <p>Fire the same request to a second replica if the first hasn't responded within some threshold (often the p95 latency for that call), and take whichever answer comes back first, canceling the other. This trades a small amount of duplicate load for a large cut in tail latency — Google's "The Tail at Scale" paper found even a small hedge rate meaningfully improved p99s.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hedge-title">
+        <title id="hedge-title">Hedged request timeline</title>
+        <text x="20" y="24" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#565F6B">Request to Replica A at t=0</text>
+        <rect x="20" y="34" width="420" height="26" rx="4" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="230" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#8C5E13">Replica A — slow this time, 420ms</text>
+
+        <text x="20" y="88" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#565F6B">Hedge fired to Replica B at t=95ms (p95 threshold)</text>
+        <rect x="115" y="98" width="90" height="26" rx="4" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="160" y="116" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">Replica B — 90ms</text>
+        <path d="M205,111 L205,130" stroke="#2F8F63" stroke-width="1.4"/>
+        <text x="215" y="140" font-family="Space Grotesk" font-size="10.5" fill="#1F6B47">first response wins — client never waits for A's 420ms</text>
+      </svg>
+      <figcaption>The hedge only fires after a threshold delay, not immediately alongside the first request — hedging every request from t=0 would double your total load for no benefit on the fast path.</figcaption>
+    </figure>
+
+    <h3 id="dlq">Dead Letter Queue (DLQ)</h3>
+    <p><strong>Solves:</strong> failed message handling — a message that a consumer can't process (bad data, a downstream bug, an exhausted retry budget) either blocks the entire queue behind it, or gets silently dropped and lost forever. Neither is acceptable.</p>
+    <p>After N failed processing attempts, move the message to a separate dead letter queue instead of retrying forever or discarding it. This unblocks the main queue immediately and preserves the message for inspection, alerting, and manual or automated reprocessing later.</p>
+
+    <div class="callout green">
+      <div class="callout-title"><span class="dot g"></span>A DLQ is a signal, not a graveyard</div>
+      Treat every message landing in a DLQ as an alert-worthy event, not a place to quietly forget about it. Un-monitored DLQs are one of the most common silent failure modes in production message systems — the queue does its job perfectly and nobody notices the pile of unprocessed orders for three days.
+    </div>
+
+    <div class="qa">
+      <div class="q">Interview drill: circuit breaker vs. retry vs. timeout — how do the three combine on a single call?</div>
+      <div class="a"><p>Timeout bounds how long you'll wait for any single attempt. Retry (with exponential backoff and jitter) decides whether to try again after a timeout or transient failure, and how many times. Circuit breaker sits above both, tracking the aggregate failure rate across many calls — once it trips OPEN, it skips the timeout-and-retry dance entirely and fails immediately, because retrying a dependency that's already known to be down just wastes time and adds more load to something already struggling.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="load-management">
+      <div class="cat-label"><span class="dot a"></span>Category 2 — Load Management Patterns</div>
+    </div>
+    <h2><span class="num">§2</span>Load management: surviving too many requests, not too few</h2>
+    <p class="section-intro">Resilience patterns assume a dependency is failing. Load management patterns assume the opposite problem: everything is healthy, there's just <strong>more demand than capacity</strong>, and something has to give — either you shape the traffic, or the traffic shapes your outage.</p>
+
+    <h3 id="rate-limiting">Rate Limiting</h3>
+    <p><strong>Solves:</strong> too many requests from a single client or in aggregate overwhelming a service, intentionally or not.</p>
+    <p>Rate limiting rejects requests once a client crosses a defined threshold, protecting the service from a single noisy client and giving fair access across many. The interesting engineering is entirely in <em>which algorithm</em> — see Token Bucket, Leaky Bucket, and Sliding Window below, each with real trade-offs.</p>
+
+    <h3 id="token-bucket">Token Bucket</h3>
+    <p><strong>Solves:</strong> smoothing bursty traffic while still allowing legitimate short bursts, rather than enforcing a rigid constant rate that would reject perfectly reasonable spikes.</p>
+    <p>A bucket holds up to <code>N</code> tokens. Tokens refill at a fixed rate. Every request consumes one token; if the bucket is empty, the request is rejected or queued. Because tokens can accumulate while idle, a client that hasn't made a request in a while can burst up to the bucket's full capacity — this is the key difference from Leaky Bucket.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tb-title">
+        <title id="tb-title">Token bucket refill and consumption</title>
+        <rect x="40" y="30" width="140" height="140" rx="10" fill="#fff" stroke="#181C22" stroke-width="1.5"/>
+        <text x="110" y="20" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#181C22">Bucket (capacity 10)</text>
+        <rect x="52" y="150" width="116" height="10" fill="#2C5FD1"/>
+        <rect x="52" y="128" width="116" height="10" fill="#2C5FD1"/>
+        <rect x="52" y="106" width="116" height="10" fill="#2C5FD1"/>
+        <rect x="52" y="84" width="116" height="10" fill="#2C5FD1"/>
+        <rect x="52" y="62" width="116" height="10" fill="#2C5FD1" opacity="0.25"/>
+        <rect x="52" y="40" width="116" height="10" fill="#2C5FD1" opacity="0.25"/>
+        <text x="110" y="188" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#565F6B">4 / 10 tokens available</text>
+
+        <text x="220" y="60" font-family="Space Grotesk" font-size="11.5" fill="#565F6B">Refill: +1 token / 100ms</text>
+        <path d="M215,70 L185,80" stroke="#2F8F63" stroke-width="1.4"/>
+        <text x="220" y="100" font-family="Space Grotesk" font-size="11.5" fill="#565F6B">Request arrives → consumes 1 token</text>
+        <path d="M215,110 L185,120" stroke="#C7454A" stroke-width="1.4"/>
+        <text x="220" y="140" font-family="Space Grotesk" font-size="11.5" fill="#565F6B">Bucket empty → request rejected (429)</text>
+        <text x="220" y="165" font-family="Space Grotesk" font-size="11.5" fill="#1F6B47">Idle client → bucket fills back to 10</text>
+      </svg>
+      <figcaption>The bucket's size sets the maximum burst; the refill rate sets the sustained long-run rate — the two are configured independently.</figcaption>
+    </figure>
+
+    <pre><code>class TokenBucket:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.tokens = capacity
+        self.refill_rate = refill_rate  # tokens per second
+        self.last_refill = time.time()
+
+    def allow(self):
+        now = time.time()
+        elapsed = now - self.last_refill
+        self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_rate)
+        self.last_refill = now
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False</code></pre>
+
+    <h3 id="leaky-bucket">Leaky Bucket</h3>
+    <p><strong>Solves:</strong> the same problem as token bucket, but where you need a strictly constant output rate — no bursts at all — because the downstream system genuinely cannot absorb them.</p>
+    <p>Requests fill a queue (the "bucket"); the queue drains at a fixed rate regardless of how fast it fills. Unlike token bucket, there's no accumulated allowance for bursting — the bucket smooths everything to one constant outflow rate, so it's the right choice when the consumer's constraint is truly about rate, not burst tolerance.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>Token Bucket</th><th>Leaky Bucket</th></tr></thead>
+        <tbody>
+          <tr><td>Allows bursts</td><td><span class="chip g">Yes</span>, up to bucket size</td><td><span class="chip r">No</span> — strictly smoothed</td></tr>
+          <tr><td>Output rate</td><td>Variable, up to refill rate + burst</td><td>Perfectly constant</td></tr>
+          <tr><td>Typical use</td><td>API rate limiting</td><td>Traffic shaping into a fixed-capacity pipe</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="sliding-window">Sliding Window (and Fixed Window)</h3>
+    <p><strong>Solves:</strong> accurate rate limiting at window boundaries — fixed windows let a client send double the intended rate by timing requests around the boundary.</p>
+    <div class="callout amber">
+      <div class="callout-title"><span class="dot a"></span>The fixed-window boundary problem</div>
+      With a 100 req/min fixed window, a client can send 100 requests at 0:59 and another 100 at 1:01 — 200 requests in a 2-second span, both technically within their respective windows. A sliding window (tracking a rolling log of timestamps, or a weighted blend of the current and previous window) closes this gap at the cost of more memory per client.
+    </div>
+
+    <h3 id="queue-leveling">Queue-Based Load Leveling</h3>
+    <p><strong>Solves:</strong> sudden traffic spikes that would overwhelm a downstream service if applied directly — decoupling producers from consumers with a buffer in between.</p>
+    <p>Instead of calling a downstream service directly, requests are placed on a queue; the downstream service consumes from that queue at whatever pace it can sustain. The spike is absorbed by the queue's depth, and the consumer never sees more load than it can actually handle — at the cost of added latency for whoever is waiting on the result.</p>
+
+    <h3 id="backpressure">Backpressure</h3>
+    <p><strong>Solves:</strong> slow consumers being overwhelmed by fast producers — without backpressure, a fast producer either OOMs an unbounded queue or silently drops data.</p>
+    <p>The consumer signals upstream — "slow down" — and the producer respects that signal rather than pushing regardless. This can be as simple as a bounded queue that blocks the producer when full, or as explicit as TCP's own flow control window, or a reactive streams protocol like <code>Flow.Subscription.request(n)</code> where the consumer explicitly pulls only as much as it can process.</p>
+
+    <h3 id="load-shedding">Load Shedding</h3>
+    <p><strong>Solves:</strong> a system already over capacity — rather than trying to serve everything slowly and risk failing all of it, load shedding deliberately drops low-priority requests to protect the ones that matter and keep the system itself alive.</p>
+    <div class="callout red">
+      <div class="callout-title"><span class="dot r"></span>Shedding vs. degrading silently under load</div>
+      A system with no explicit shedding policy doesn't avoid this trade-off — it just makes it implicitly and badly: everything slows down together until the whole thing falls over, including the requests you most needed to succeed. Explicit shedding (reject low-priority traffic first, based on a defined priority signal) keeps the system serving <em>something</em> correctly rather than serving nothing at all.
+    </div>
+
+    <h3 id="priority-queue">Priority Queue (for traffic)</h3>
+    <p><strong>Solves:</strong> "VIP" traffic — some requests (a paying customer, a critical internal service, a health check) need to jump ahead of routine background traffic when a system is under load.</p>
+    <p>Tag requests with a priority at ingress and drain higher-priority queues first. This is what makes load shedding <em>selective</em> rather than random — shedding decisions become "drop from the lowest-priority queue first," not "drop whatever happens to be oldest."</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: why not just always use token bucket everywhere?</div>
+      <div class="a"><p>Token bucket is the right default for most API rate limiting because it tolerates reasonable bursts, which matches how real clients actually behave. But if a downstream system genuinely can't absorb any burst — a fixed-capacity hardware pipe, a strict SLA with a third party — leaky bucket's constant output rate is the correct tool, even though it will introduce latency that token bucket would have avoided for a bursty but otherwise-compliant client.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="caching">
+      <div class="cat-label"><span class="dot g"></span>Category 3 — Caching Patterns</div>
+    </div>
+    <h2><span class="num">§3</span>Caching: trading correctness-freshness for speed</h2>
+    <p class="section-intro">Every caching pattern is the same trade dressed differently: some data is expensive to compute or fetch, so you keep a copy somewhere faster — and now you own the question of when that copy stops matching the truth.</p>
+
+    <h3 id="cache-aside">Cache Aside (Lazy Loading)</h3>
+    <p><strong>Solves:</strong> read-heavy systems where most data is never touched — cache aside only populates the cache with data that's actually been requested, rather than pre-loading everything.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ca-title">
+        <title id="ca-title">Cache aside read path</title>
+        <defs><marker id="ca1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <rect x="20" y="70" width="100" height="46" rx="8" fill="#fff" stroke="#181C22"/>
+        <text x="70" y="97" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#181C22">App</text>
+        <path d="M120,85 L200,50" stroke="#565F6B" stroke-width="1.3" marker-end="url(#ca1)"/>
+        <text x="160" y="40" font-family="Space Grotesk" font-size="10" fill="#565F6B">1. read cache</text>
+        <rect x="200" y="20" width="130" height="46" rx="8" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="265" y="47" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#1F6B47">Cache</text>
+        <path d="M200,60 L120,100" stroke="#C7454A" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ca1)"/>
+        <text x="165" y="115" font-family="Space Grotesk" font-size="10" fill="#8E2E32">2. MISS</text>
+        <path d="M120,105 L200,150" stroke="#565F6B" stroke-width="1.3" marker-end="url(#ca1)"/>
+        <text x="150" y="140" font-family="Space Grotesk" font-size="10" fill="#565F6B">3. read DB</text>
+        <rect x="200" y="130" width="130" height="46" rx="8" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="265" y="157" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#8C5E13">Database</text>
+        <path d="M330,150 L400,90" stroke="#2F8F63" stroke-width="1.3" marker-end="url(#ca1)"/>
+        <text x="400" y="115" font-family="Space Grotesk" font-size="10" fill="#1F6B47">4. write result</text>
+        <text x="400" y="128" font-family="Space Grotesk" font-size="10" fill="#1F6B47">back to cache</text>
+      </svg>
+      <figcaption>The application owns the cache logic explicitly — the cache itself has no idea the database exists.</figcaption>
+    </figure>
+
+    <pre><code>def get_user(user_id):
+    cached = cache.get(f"user:{user_id}")
+    if cached:
+        return cached
+    user = db.query("SELECT * FROM users WHERE id = ?", user_id)
+    cache.set(f"user:{user_id}", user, ttl=300)
+    return user</code></pre>
+
+    <h3 id="read-write-through">Read Through / Write Through</h3>
+    <p><strong>Solves:</strong> the same miss-then-fetch problem as cache aside, but pushes that logic into the caching layer itself rather than the application — the app only ever talks to the cache, and the cache transparently handles the database on a miss (read through) or writes to both synchronously (write through).</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Pattern</th><th>Who owns the miss/write logic</th><th>Consistency</th></tr></thead>
+        <tbody>
+          <tr><td>Cache Aside</td><td>Application code</td><td>Cache can go stale if writes bypass it</td></tr>
+          <tr><td>Read Through</td><td>Cache library/provider</td><td>Same risk, less app code</td></tr>
+          <tr><td>Write Through</td><td>Cache library/provider</td><td>Cache and DB always in sync — but every write pays DB latency</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="write-behind">Write Behind (Write Back)</h3>
+    <p><strong>Solves:</strong> write latency — write through pays the full database write cost on every request; write behind acknowledges the write once it's in the cache and flushes to the database asynchronously afterward.</p>
+    <div class="callout red">
+      <div class="callout-title"><span class="dot r"></span>The trade you're actually making</div>
+      Faster writes, at the cost of a real durability gap: if the cache node dies before the async flush completes, that write is gone. Only use write behind for data where losing the last few seconds of writes on a rare crash is an acceptable risk — never for anything like a financial ledger.
+    </div>
+    <p><strong>Refresh Ahead</strong> is the read-side complement: proactively refresh a cache entry before it expires (typically when it's accessed and its TTL is getting close to zero), so a legitimately popular key never actually experiences a cache miss.</p>
+
+    <h3 id="cache-stampede">Cache Stampede Prevention</h3>
+    <p><strong>Solves:</strong> a cache miss storm — a popular key expires, and hundreds of concurrent requests all miss simultaneously and hammer the database at once with the identical query, sometimes hard enough to take the database down.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>Lock / single-flight</h4>
+        <p>Only the first request to miss actually queries the database; it acquires a short lock, and every other concurrent request for that same key waits on the result instead of also querying.</p>
+      </div>
+      <div class="card">
+        <h4>Probabilistic early expiration</h4>
+        <p>Refresh a key slightly before its real TTL, with randomized jitter per key, so many keys with the same nominal TTL don't all expire in the same instant.</p>
+      </div>
+    </div>
+
+    <h3 id="bloom-filter">Bloom Filter</h3>
+    <p><strong>Solves:</strong> cache penetration — repeated lookups for keys that don't exist at all still miss the cache and hit the database every single time, since there's nothing to cache for a key with no data.</p>
+    <p>A Bloom filter is a compact probabilistic structure that answers "might this key exist?" with no false negatives but a tunable false-positive rate. Check it before querying the database: a definite "no" skips the database entirely; a "maybe" proceeds as normal. It costs a small amount of memory to eliminate a large class of pointless database hits from bots, scrapers, or bad IDs.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bf-title">
+        <title id="bf-title">Bloom filter guard in front of the database</title>
+        <rect x="20" y="50" width="120" height="46" rx="8" fill="#fff" stroke="#181C22"/>
+        <text x="80" y="77" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#181C22">Lookup key K</text>
+        <path d="M140,73 L210,73" stroke="#565F6B" stroke-width="1.3"/>
+        <rect x="210" y="50" width="150" height="46" rx="8" fill="#EAE2F7" stroke="#7A54C9"/>
+        <text x="285" y="77" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#4E3080">Bloom filter</text>
+        <path d="M360,60 L440,30" stroke="#C7454A" stroke-width="1.3"/>
+        <text x="420" y="20" font-family="Space Grotesk" font-size="10" fill="#8E2E32">definitely absent → reject, skip DB</text>
+        <path d="M360,86 L440,120" stroke="#2F8F63" stroke-width="1.3"/>
+        <text x="420" y="138" font-family="Space Grotesk" font-size="10" fill="#1F6B47">maybe present → proceed to cache/DB</text>
+      </svg>
+      <figcaption>The filter only ever prevents wasted lookups for keys that are truly absent — it never blocks a real key, by construction.</figcaption>
+    </figure>
+
+    <h3 id="hot-key">Hot Key Replication</h3>
+    <p><strong>Solves:</strong> hot partitions — a single extremely popular key (a viral post, a celebrity's profile) can overload the one cache node or shard responsible for it, even while every other node sits idle.</p>
+    <p>Replicate the hot key across multiple cache nodes and route reads to a randomly chosen replica, spreading load for that one key across several machines instead of concentrating it on one. Detecting which keys are "hot" in the first place usually requires sampling access frequency in real time.</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: cache aside vs write through — which would you pick for a shopping cart service?</div>
+      <div class="a"><p>Write through, generally — cart contents need to be immediately consistent between cache and database, since a stale read right after a write (say, right after "add to cart") is a visible, confusing bug for the user. The extra write latency is an acceptable cost for a low-volume, correctness-sensitive write path. Cache aside would be a better fit for something read-heavy and more tolerant of brief staleness, like a product catalog page.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="messaging">
+      <div class="cat-label"><span class="dot b"></span>Category 4 — Messaging Patterns</div>
+    </div>
+    <h2><span class="num">§4</span>Messaging: decoupling producers from consumers in time</h2>
+    <p class="section-intro">Synchronous request/response ties a caller's fate to the callee's availability and speed. Messaging patterns break that coupling — the producer emits and moves on, the consumer processes on its own schedule, and the hard problems that surface are ordering, duplication, and partial failure across that gap.</p>
+
+    <h3 id="pubsub">Publish/Subscribe</h3>
+    <p><strong>Solves:</strong> event broadcasting — one event often needs to trigger action in several unrelated downstream systems (billing, analytics, notifications), and the publisher shouldn't need to know who's listening.</p>
+    <p>A publisher emits to a topic; any number of subscribers receive a copy independently. Adding a new subscriber never requires changing the publisher — this decoupling is the entire point, and it's what lets a system's downstream consumers grow over time without touching upstream code.</p>
+
+    <h3 id="event-sourcing">Event Sourcing</h3>
+    <p><strong>Solves:</strong> audit history — storing only the current state of an entity throws away exactly how it got there, which is often exactly what you need for debugging, compliance, or rebuilding derived views.</p>
+    <p>Instead of storing current state, store the full sequence of events that produced it (<code>AccountOpened</code>, <code>Deposited $50</code>, <code>Withdrew $20</code>) and derive current state by replaying them. The event log becomes the single source of truth; any view of "current state" is just a projection that can be rebuilt from scratch if it's ever wrong.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="es-title">
+        <title id="es-title">Event log to current state</title>
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <rect x="20" y="50" width="120" height="40" rx="6" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="80" y="74" text-anchor="middle" fill="#1F3A93">AccountOpened</text>
+          <rect x="160" y="50" width="120" height="40" rx="6" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="220" y="74" text-anchor="middle" fill="#1F3A93">Deposited $50</text>
+          <rect x="300" y="50" width="120" height="40" rx="6" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="360" y="74" text-anchor="middle" fill="#1F3A93">Withdrew $20</text>
+          <rect x="440" y="50" width="120" height="40" rx="6" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="500" y="74" text-anchor="middle" fill="#1F3A93">Deposited $10</text>
+        </g>
+        <path d="M140,70 L160,70 M280,70 L300,70 M420,70 L440,70" stroke="#565F6B" stroke-width="1.3"/>
+        <path d="M560,70 L620,70" stroke="#2F8F63" stroke-width="1.4"/>
+        <rect x="620" y="45" width="60" height="50" rx="6" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="650" y="66" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#1F6B47">balance</text>
+        <text x="650" y="82" text-anchor="middle" font-family="Space Grotesk" font-size="11" font-weight="700" fill="#1F6B47">$40</text>
+        <text x="20" y="130" font-family="Space Grotesk" font-size="11" fill="#565F6B">Replaying the log rebuilds current state — and any bug in a derived view</text>
+        <text x="20" y="146" font-family="Space Grotesk" font-size="11" fill="#565F6B">can be fixed by fixing the projection logic and replaying, not by data repair.</text>
+      </svg>
+      <figcaption>The events are immutable and append-only; "current balance" is just one possible projection of them.</figcaption>
+    </figure>
+
+    <h3 id="cqrs">CQRS (Command Query Responsibility Segregation)</h3>
+    <p><strong>Solves:</strong> read and write workloads with very different shapes — a single model optimized for one is usually a poor fit for the other, especially at scale.</p>
+    <p>Split the write model (commands, normalized, optimized for correctness and validation) from the read model (queries, often denormalized, optimized for the exact shape a UI needs). The two can even live in entirely separate datastores, kept in sync via the events emitted by the write side — which is why CQRS and Event Sourcing so often show up paired together.</p>
+
+    <div class="callout amber">
+      <div class="callout-title"><span class="dot a"></span>CQRS adds real complexity — it's not a default</div>
+      Two models means two things to keep consistent, and the read model is often eventually consistent with the write model rather than immediately so. Reach for CQRS when read and write really do have conflicting scaling or shape requirements — not as a default architecture for every service.
+    </div>
+
+    <h3 id="saga">Saga Pattern</h3>
+    <p><strong>Solves:</strong> distributed transactions — a single business operation (place an order) that spans multiple services (payment, inventory, shipping) has no single database transaction that can wrap all of it atomically.</p>
+    <p>A saga breaks the operation into a sequence of local transactions, one per service, each with a defined <strong>compensating transaction</strong> to undo it if a later step fails. If step 3 of 4 fails, the saga runs the compensations for steps 2 and 1 in reverse — refund the payment, release the reserved inventory — rather than leaving the system in a half-completed state.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>Choreography</h4>
+        <p>Each service reacts to events from the previous step and emits its own — no central coordinator. Simpler for a few steps, but the overall flow is implicit and gets hard to trace as steps grow.</p>
+      </div>
+      <div class="card">
+        <h4>Orchestration</h4>
+        <p>A central orchestrator explicitly calls each step and triggers compensations on failure. The flow is explicit and easy to trace, at the cost of a new single component to build and operate.</p>
+      </div>
+    </div>
+
+    <h3 id="outbox">Outbox Pattern</h3>
+    <p><strong>Solves:</strong> reliable event publishing — writing to your database and separately publishing an event to a message broker is two operations with no shared transaction; a crash between them either loses the event or publishes one for a database write that never actually committed.</p>
+    <p>Write the event to an "outbox" table in the <em>same database transaction</em> as the actual business data change — so both succeed or both roll back together, atomically. A separate process then reads the outbox table and publishes each event to the broker, marking it published once confirmed.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="outbox-title">
+        <title id="outbox-title">Outbox pattern flow</title>
+        <rect x="20" y="20" width="280" height="80" rx="8" fill="#fff" stroke="#181C22"/>
+        <text x="160" y="42" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#181C22">Single DB transaction</text>
+        <rect x="36" y="52" width="110" height="34" rx="6" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="91" y="73" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">orders table</text>
+        <rect x="156" y="52" width="110" height="34" rx="6" fill="#DFE6F9" stroke="#2C5FD1"/>
+        <text x="211" y="73" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1F3A93">outbox table</text>
+
+        <path d="M211,86 L211,120" stroke="#565F6B" stroke-width="1.3"/>
+        <text x="270" y="112" font-family="Space Grotesk" font-size="10.5" fill="#565F6B">poller reads unpublished rows</text>
+        <rect x="330" y="100" width="140" height="40" rx="8" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="400" y="124" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#8C5E13">Relay / poller</text>
+        <path d="M470,120 L560,120" stroke="#2F8F63" stroke-width="1.4"/>
+        <rect x="560" y="100" width="120" height="40" rx="8" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="620" y="124" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">Message broker</text>
+      </svg>
+      <figcaption>The write to the outbox table is transactionally atomic with the business write; publishing to the broker happens afterward and can be retried independently.</figcaption>
+    </figure>
+
+    <p>The <strong>Inbox Pattern</strong> is the consumer-side complement: track which message IDs have already been processed in a dedicated table, so a redelivered message (which brokers will do — see Delivery Guarantees) is recognized and skipped rather than processed twice.</p>
+
+    <h3 id="idempotent-consumer">Idempotent Consumer</h3>
+    <p><strong>Solves:</strong> duplicate messages — most real message brokers guarantee <em>at-least-once</em> delivery, meaning a consumer must expect to see the same message more than once and handle it safely.</p>
+    <p>Design message handlers so processing the same message twice produces the same result as processing it once — track processed message IDs (an inbox table, a Redis set with a TTL) and skip anything already seen. See the Idempotency pattern in the Reliability section for the general principle this pattern applies specifically to consumers.</p>
+
+    <h3 id="competing-consumers">Competing Consumers</h3>
+    <p><strong>Solves:</strong> parallel processing — a single consumer processing a queue serially caps throughput at that one consumer's speed, even when the work is fully parallelizable.</p>
+    <p>Run multiple consumer instances against the same queue; the broker hands each message to exactly one of them, so throughput scales roughly linearly with the number of consumers. The catch: message <em>ordering</em> across the whole queue is no longer guaranteed once more than one consumer is pulling from it — if order matters for a given entity, route related messages to the same consumer (partitioning by key, as Kafka does) rather than trying to preserve global order.</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: why does the outbox pattern need a separate transaction, not just "publish after commit"?</div>
+      <div class="a"><p>Because "commit the DB write, then publish the event" is two separate operations with a crash window between them. If the process dies after the commit but before the publish succeeds, the event is lost forever with no record it was ever supposed to happen. Writing the event into the same transaction as the business data guarantees the two either both happen or neither does — the event's existence in the outbox table is itself durable and transactional, and publishing from there becomes a retryable, idempotent operation instead of a single point of loss.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="database">
+      <div class="cat-label"><span class="dot p"></span>Category 5 — Database Patterns</div>
+    </div>
+    <h2><span class="num">§5</span>Database patterns: scaling storage without losing your data</h2>
+    <p class="section-intro">A single database server can only hold so much data and answer so many queries per second. These patterns are how systems keep growing past that ceiling — splitting data up, copying it around, and controlling who gets to change it and when.</p>
+
+    <h3 id="sharding">Sharding</h3>
+    <p><strong>Solves:</strong> horizontal scaling of storage and write throughput — a dataset too large or too write-heavy for one machine gets split across many, each holding a subset ("shard") of the total data.</p>
+    <p>The critical decision is the <strong>shard key</strong> — the field used to decide which shard a given row lives on. A well-chosen key spreads load evenly; a poor one (say, sharding by signup date when all recent traffic hits recent signups) creates a hot shard that defeats the entire point of sharding.</p>
+
+    <div class="callout red">
+      <div class="callout-title"><span class="dot r"></span>What sharding costs you</div>
+      Cross-shard joins and transactions become genuinely hard — a query spanning two shards either needs an application-level join or a distributed transaction protocol, both significantly more complex than a single-node query. Shard only once a single node's capacity is the actual, measured constraint.
+    </div>
+
+    <h3 id="read-replicas">Read Replicas &amp; Leader-Follower Replication</h3>
+    <p><strong>Solves:</strong> read scalability and high availability — most systems read far more than they write, so directing all reads at one primary wastes the ability to scale reads independently.</p>
+    <p>One leader accepts writes and replicates them (synchronously or asynchronously) to one or more followers, which serve read traffic. Asynchronous replication means followers can lag behind the leader by some amount — this is <strong>replication lag</strong>, and it's the direct cause of "I just wrote something and then couldn't see it on the very next read."</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="repl-title">
+        <title id="repl-title">Leader-follower replication with lag</title>
+        <rect x="280" y="20" width="140" height="50" rx="8" fill="#F6E9D3" stroke="#C8862B" stroke-width="1.5"/>
+        <text x="350" y="50" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#8C5E13">Leader (writes)</text>
+        <path d="M320,70 L120,120" stroke="#565F6B" stroke-width="1.3"/>
+        <path d="M380,70 L580,120" stroke="#565F6B" stroke-width="1.3"/>
+        <rect x="40" y="120" width="160" height="46" rx="8" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="120" y="147" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">Follower A — lag: 12ms</text>
+        <rect x="500" y="120" width="160" height="46" rx="8" fill="#F7E4E3" stroke="#C7454A"/>
+        <text x="580" y="147" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#8E2E32">Follower B — lag: 4.2s</text>
+        <text x="500" y="20" font-family="Space Grotesk" font-size="10.5" fill="#8E2E32">↑ a read routed here won't see a write from 3 seconds ago</text>
+      </svg>
+      <figcaption>Lag isn't constant across followers — it depends on that follower's own load, network path, and replay speed, which is why "read your own writes" often routes the immediate follow-up read to the leader.</figcaption>
+    </figure>
+
+    <p><strong>Leader-leader (multi-leader) replication</strong> accepts writes at more than one node, usually one per region for low-latency local writes — at the cost of needing an explicit conflict-resolution strategy (last-write-wins, CRDTs, or vector clocks — see below) for when two leaders accept conflicting writes to the same record.</p>
+
+    <h3 id="consistent-hashing">Consistent Hashing</h3>
+    <p><strong>Solves:</strong> even distribution across nodes while minimizing data movement when a node is added or removed — naive <code>hash(key) % N</code> reshuffles almost every key's assigned node the instant <code>N</code> changes.</p>
+    <p>Nodes and keys are both hashed onto the same conceptual ring; a key belongs to the first node found walking clockwise from its position. Adding or removing one node only reassigns the keys between it and its ring neighbor — every other key stays exactly where it was.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ch-title">
+        <title id="ch-title">Consistent hashing ring</title>
+        <circle cx="200" cy="200" r="150" fill="none" stroke="#D8DBD1" stroke-width="2"/>
+        <circle cx="200" cy="50" r="9" fill="#2F8F63"/>
+        <text x="200" y="30" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">Node A</text>
+        <circle cx="330" cy="140" r="9" fill="#2C5FD1"/>
+        <text x="358" y="140" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F3A93">Node B</text>
+        <circle cx="280" cy="320" r="9" fill="#C8862B"/>
+        <text x="280" y="345" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#8C5E13">Node C</text>
+        <circle cx="90" cy="290" r="9" fill="#7A54C9"/>
+        <text x="60" y="310" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#4E3080">Node D</text>
+        <circle cx="240" cy="70" r="5" fill="#181C22"/>
+        <circle cx="300" cy="200" r="5" fill="#181C22"/>
+        <circle cx="220" cy="300" r="5" fill="#181C22"/>
+        <text x="330" y="215" font-family="IBM Plex Mono" font-size="9.5" fill="#565F6B">key → B (clockwise)</text>
+      </svg>
+      <figcaption>Each dark dot is a key; it belongs to whichever node is next clockwise. Remove Node B and only the keys between D and B move — to C, its new clockwise neighbor.</figcaption>
+    </figure>
+
+    <h3 id="materialized-views">Materialized Views</h3>
+    <p><strong>Solves:</strong> expensive queries run repeatedly — a complex join or aggregation recomputed on every request wastes work when the underlying data changes far less often than it's read.</p>
+    <p>Precompute and store the query's result as its own table, refreshed periodically or on a trigger from the underlying data changing. Reads become a simple lookup; the cost moves to keeping the view updated, which is a deliberate trade of freshness for read speed.</p>
+
+    <h3 id="optimistic-pessimistic">Optimistic vs. Pessimistic Locking</h3>
+    <p><strong>Solves:</strong> concurrent updates to the same row — two transactions modifying the same data at once need a strategy to prevent one from silently overwriting the other's work.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>Optimistic Locking</th><th>Pessimistic Locking</th></tr></thead>
+        <tbody>
+          <tr><td>Mechanism</td><td>Version column checked on write; write fails if version changed</td><td><code>SELECT ... FOR UPDATE</code> — actually holds a lock</td></tr>
+          <tr><td>Blocks other readers/writers?</td><td>No — they proceed freely</td><td>Yes — they wait</td></tr>
+          <tr><td>Best for</td><td>Low contention, most writes don't actually conflict</td><td>High contention, conflicts are common and cheap to just wait for</td></tr>
+          <tr><td>Failure mode</td><td>Caller must detect the conflict and retry</td><td>Risk of deadlock between multiple lock holders</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="qa">
+      <div class="q">Interview drill: you're seeing "lost updates" on a row two services both write to — which locking strategy, and why?</div>
+      <div class="a"><p>Depends on how often the two services actually collide. If it's rare — most writes touch different rows or happen at different times — optimistic locking with a version column is lighter weight: no lock is held, most writes just succeed, and only the rare genuine conflict needs a retry. If the two services are frequently racing for the exact same row, pessimistic locking is more predictable, because optimistic locking under heavy contention just means most writes fail and retry repeatedly, which can be worse than briefly blocking.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="distributed-systems">
+      <div class="cat-label"><span class="dot r"></span>Category 6 — Distributed System Patterns</div>
+    </div>
+    <h2><span class="num">§6</span>Distributed systems: agreement without a shared clock or a single point of truth</h2>
+    <p class="section-intro">Everything in this section exists because of one hard fact: in a distributed system, there is no shared, reliable notion of "now," and any message can be delayed, lost, or arrive out of order. You cannot tell the difference between "that node is slow" and "that node is dead" from the outside — every pattern here is a strategy for making progress anyway, despite that fundamental uncertainty.</p>
+
+    <h3 id="leader-election">Leader Election</h3>
+    <p><strong>Solves:</strong> needing exactly one coordinator among a group of equivalent nodes — for accepting writes, scheduling work, or breaking ties — without a human manually assigning the role and without two nodes both believing they're in charge at once.</p>
+    <p>Nodes run a protocol (Bully algorithm, Raft's leader election, or a lease held in a coordination service like ZooKeeper or etcd) to agree on a single leader. The leader typically holds a time-bound lease it must periodically renew; if it stops renewing (because it crashed, or is partitioned away), the lease expires and the remaining nodes elect a new one.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="le-title">
+        <title id="le-title">Leader election via lease renewal</title>
+        <defs><marker id="le1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <rect x="280" y="20" width="140" height="50" rx="8" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="350" y="50" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#1F6B47">Node B — LEADER</text>
+        <text x="350" y="85" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#565F6B">renews lease every 2s</text>
+
+        <rect x="60" y="140" width="130" height="46" rx="8" fill="#fff" stroke="#181C22"/>
+        <text x="125" y="167" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#181C22">Node A — follower</text>
+        <rect x="500" y="140" width="130" height="46" rx="8" fill="#fff" stroke="#181C22"/>
+        <text x="565" y="167" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#181C22">Node C — follower</text>
+
+        <path d="M350,70 L350,110" stroke="#C7454A" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <text x="360" y="105" font-family="Space Grotesk" font-size="10.5" fill="#8E2E32">Node B crashes — lease not renewed</text>
+
+        <path d="M190,163 L500,163" stroke="#565F6B" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <text x="345" y="200" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#565F6B">Lease expires → A and C race to acquire it → C wins, becomes new leader</text>
+      </svg>
+      <figcaption>The lease's timeout is the whole safety mechanism — too short and healthy leaders get evicted by transient network blips; too long and the system is leaderless for that whole duration after a real crash.</figcaption>
+    </figure>
+
+    <h3 id="service-discovery">Service Discovery</h3>
+    <p><strong>Solves:</strong> dynamic instances — in an environment where service instances are created and destroyed constantly (autoscaling, deploys, crashes), hardcoded IP addresses break immediately.</p>
+    <div class="cards">
+      <div class="card">
+        <h4>Client-side discovery</h4>
+        <p>The client queries a registry (Consul, etcd, ZooKeeper) directly and picks an instance itself. Fewer moving parts, but every client needs registry-aware logic.</p>
+      </div>
+      <div class="card">
+        <h4>Server-side discovery</h4>
+        <p>The client calls a fixed address (a load balancer or service mesh sidecar); that layer queries the registry on the client's behalf. Simpler clients, one more infrastructure component.</p>
+      </div>
+    </div>
+    <p>Either way, instances register themselves on startup and deregister (or get removed via failed health checks) on shutdown — the registry's accuracy depends entirely on this registration/deregistration discipline actually being reliable.</p>
+
+    <h3 id="heartbeat">Heartbeat</h3>
+    <p><strong>Solves:</strong> failure detection — in a distributed system, you can't directly observe whether a remote node is alive; a heartbeat is the mechanism that lets you infer it.</p>
+    <p>Each node periodically sends a lightweight "I'm alive" signal. Miss enough consecutive heartbeats and the node is presumed dead — but this is a probabilistic judgment, not a certainty: a node can be alive but partitioned from the network, indistinguishable from actually being dead to everyone else. This ambiguity is precisely why distributed systems need consensus protocols rather than simple heartbeat-based assumptions for anything safety-critical.</p>
+
+    <h3 id="gossip">Gossip Protocol</h3>
+    <p><strong>Solves:</strong> cluster-wide communication without every node needing to talk to every other node directly — a naive all-to-all broadcast doesn't scale past a small cluster size.</p>
+    <p>Each node periodically shares what it knows with a small, random subset of other nodes; information spreads exponentially through the cluster the way a rumor spreads through a social network, reaching every node in <code>O(log N)</code> rounds without any single node needing global connectivity. Cassandra and Consul both use gossip for cluster membership and failure detection.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="gossip-title">
+        <title id="gossip-title">Gossip spread across three rounds</title>
+        <g font-family="Space Grotesk" font-size="10">
+        <text x="80" y="20" text-anchor="middle" fill="#565F6B">Round 0</text>
+        <circle cx="80" cy="60" r="8" fill="#2F8F63"/>
+        <circle cx="50" cy="100" r="6" fill="#D8DBD1"/><circle cx="80" cy="110" r="6" fill="#D8DBD1"/><circle cx="110" cy="100" r="6" fill="#D8DBD1"/>
+
+        <text x="330" y="20" text-anchor="middle" fill="#565F6B">Round 1 — tells 2 random peers</text>
+        <circle cx="330" cy="60" r="8" fill="#2F8F63"/>
+        <circle cx="270" cy="110" r="8" fill="#2F8F63"/><circle cx="390" cy="110" r="8" fill="#2F8F63"/>
+        <circle cx="240" cy="150" r="6" fill="#D8DBD1"/><circle cx="420" cy="150" r="6" fill="#D8DBD1"/>
+        <path d="M330,68 L270,102" stroke="#2F8F63" stroke-width="1.2"/>
+        <path d="M330,68 L390,102" stroke="#2F8F63" stroke-width="1.2"/>
+
+        <text x="580" y="20" text-anchor="middle" fill="#565F6B">Round 2 — nearly all infected</text>
+        <circle cx="580" cy="60" r="7" fill="#2F8F63"/><circle cx="530" cy="100" r="7" fill="#2F8F63"/><circle cx="630" cy="100" r="7" fill="#2F8F63"/>
+        <circle cx="500" cy="140" r="7" fill="#2F8F63"/><circle cx="560" cy="150" r="7" fill="#2F8F63"/><circle cx="610" cy="145" r="7" fill="#2F8F63"/><circle cx="660" cy="135" r="7" fill="#2F8F63"/>
+        </g>
+      </svg>
+      <figcaption>Exponential spread means the number of "informed" nodes roughly doubles each round — a cluster of thousands converges in a handful of rounds.</figcaption>
+    </figure>
+
+    <h3 id="distributed-lock">Distributed Lock</h3>
+    <p><strong>Solves:</strong> shared resource access across multiple processes on different machines — a normal in-process mutex only protects against concurrent access within one process; a distributed lock is needed when the contenders are separate machines entirely.</p>
+    <p>Typically implemented on top of a coordination service (ZooKeeper, etcd, or Redis via the Redlock algorithm) as a lease with a TTL: a client acquires the lock, does its work, and releases it, or the lease expires automatically if the client crashes mid-operation.</p>
+
+    <div class="callout red">
+      <div class="callout-title"><span class="dot r"></span>The classic distributed-lock bug: the pause-after-acquire</div>
+      A client acquires the lock, then experiences a long GC pause or network stall well past the lock's TTL. The lock silently expires and another client acquires it, believing it now has exclusive access — while the first client, unaware it lost the lock, resumes and keeps acting as if it's still the exclusive holder. Both are now operating on the resource simultaneously. Defending against this requires a monotonically increasing "fencing token" issued with the lock, checked and enforced by the resource being protected itself — not by the lock service, which has no way to stop the first client from acting on stale information.
+    </div>
+
+    <h3 id="2pc-3pc">Two-Phase Commit (2PC) &amp; Three-Phase Commit (3PC)</h3>
+    <p><strong>Solves:</strong> strong, atomic consistency across multiple independent databases or services participating in one logical transaction.</p>
+    <div class="cards">
+      <div class="card">
+        <h4>Two-Phase Commit</h4>
+        <p><strong>Phase 1 (prepare):</strong> coordinator asks every participant "can you commit?" and each locks its resources and replies yes/no. <strong>Phase 2 (commit):</strong> if all said yes, coordinator tells everyone to commit; if any said no, tells everyone to abort.</p>
+      </div>
+      <div class="card">
+        <h4>The blocking problem</h4>
+        <p>If the coordinator crashes after phase 1 but before phase 2, every participant is stuck holding its locks indefinitely, unable to know whether to commit or abort — this is 2PC's core weakness.</p>
+      </div>
+    </div>
+    <p><strong>Three-Phase Commit</strong> adds an intermediate "pre-commit" acknowledgment step specifically to reduce (not eliminate) this blocking window, at the cost of one more network round trip on every transaction. In practice, most modern systems avoid both altogether in favor of the Saga pattern's eventual consistency, precisely because blocking on a coordinator is such an availability risk.</p>
+
+    <h3 id="quorum">Quorum Reads/Writes</h3>
+    <p><strong>Solves:</strong> tunable consistency in a replicated system — rather than requiring every replica to acknowledge a write (which kills availability the moment any one replica is slow) or just one (which risks reading stale data), quorum lets you require a majority.</p>
+    <p>With <code>N</code> replicas, a write requires acknowledgment from <code>W</code> of them, and a read requires responses from <code>R</code> of them. The guarantee <code>W + R &gt; N</code> ensures every read overlaps with the most recent write in at least one replica — giving you strong consistency without needing all <code>N</code> nodes to participate in every operation.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Configuration</th><th>Property</th></tr></thead>
+        <tbody>
+          <tr><td>W = N, R = 1</td><td>Fast reads, slow/fragile writes (any replica down blocks writes)</td></tr>
+          <tr><td>W = 1, R = N</td><td>Fast writes, slow/fragile reads</td></tr>
+          <tr><td>W = R = (N/2)+1</td><td>Balanced — the common choice; tolerates minority node failures for both</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="consensus">Consensus (Raft / Paxos)</h3>
+    <p><strong>Solves:</strong> getting a cluster of unreliable nodes, communicating over an unreliable network, to agree on a single value or sequence of operations — the foundational problem underneath leader election, distributed locks, and replicated logs alike.</p>
+    <p><strong>Raft</strong> (designed explicitly to be more understandable than Paxos) works in rounds called terms: a leader is elected per term and replicates a log of operations to followers, committing an entry only once a majority of nodes have durably stored it. <strong>Paxos</strong> solves the identical underlying problem with a more general but notoriously harder-to-implement-correctly two-phase proposal/accept protocol. Both guarantee safety (no two nodes disagree on a committed value) as long as a majority of nodes are healthy and can communicate.</p>
+
+    <div class="callout blue">
+      <div class="callout-title"><span class="dot b"></span>Why this is the pattern everything else quietly depends on</div>
+      etcd runs Raft. ZooKeeper runs a Paxos-like protocol called ZAB. Every "distributed lock" and "leader election" pattern above that uses one of these systems is, underneath, relying on consensus to make sure the cluster agrees on who holds the lock or who the leader is — consensus isn't a peer to those patterns, it's the substrate they're built on.
+    </div>
+
+    <h3 id="vector-clocks">Vector Clocks</h3>
+    <p><strong>Solves:</strong> conflict resolution when there's no global clock to say definitively which of two concurrent writes "happened first" — wall-clock timestamps from different machines can't be trusted to agree, and even if they could, two writes can be genuinely concurrent with no real ordering between them.</p>
+    <p>Each node keeps a vector of counters, one per node, incremented on every local update and merged (taking the max per position) on every message received. Comparing two vector clocks tells you whether one write causally preceded the other, or whether they were truly concurrent and need explicit conflict resolution (last-write-wins, application-level merge, or presenting both to the user, as early Amazon Dynamo famously did with shopping carts).</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: what's the actual difference between a heartbeat failure and a network partition, and why does it matter?</div>
+      <div class="a"><p>From the observer's side, they're indistinguishable — both look like "stopped responding." The difference matters because the correct response is different: a genuinely dead node can safely be replaced, its locks released, its role reassigned. A partitioned-but-alive node might still be doing work, might still hold a lock it believes is valid, and might rejoin later with stale state. This is exactly why lock services use fencing tokens and why consensus protocols require majority agreement rather than trusting any single node's judgment about who else is alive — the system has to be correct even when it can never be fully sure which case it's in.</p></div>
+    </div>
+    <div class="qa">
+      <div class="q">Interview drill: quorum reads/writes vs. 2PC — both involve "getting enough nodes to agree." What's actually different?</div>
+      <div class="a"><p>2PC coordinates one atomic transaction across distinct participants that each need to do something different (debit here, credit there) and all must agree before any of them commits — it's about atomicity across heterogeneous operations. Quorum is about replication of the <em>same</em> data across homogeneous copies, and it deliberately allows partial participation (W or R out of N) rather than requiring unanimous agreement, trading strict atomicity for availability. 2PC can block indefinitely on a coordinator failure; quorum systems are specifically designed to keep functioning as long as a majority of replicas are reachable.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="traffic-routing">
+      <div class="cat-label"><span class="dot b"></span>Category 7 — Traffic Routing Patterns</div>
+    </div>
+    <h2><span class="num">§7</span>Traffic routing: getting requests to the right place, safely</h2>
+    <p class="section-intro">Once you have more than one instance of a service — or more than one version of it — something has to decide which instance handles which request, and how a new version gets introduced without breaking everything currently in flight.</p>
+
+    <h3 id="load-balancer">Load Balancer</h3>
+    <p><strong>Solves:</strong> traffic distribution — spreading incoming requests across multiple backend instances so no single instance is overwhelmed while others sit idle.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Algorithm</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td>Round robin</td><td>Cycles through instances in order — simple, ignores actual instance load</td></tr>
+          <tr><td>Least connections</td><td>Sends to whichever instance has the fewest active connections</td></tr>
+          <tr><td>Weighted</td><td>Some instances get proportionally more traffic (useful for mixed instance sizes)</td></tr>
+          <tr><td>Consistent hash</td><td>Same client/key routes to the same instance — needed for sticky sessions</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Sticky Sessions</strong> pin a given client to the same backend instance for the life of their session — necessary when session state lives in that instance's memory rather than a shared store, at the cost of uneven load if some clients are far more active than others.</p>
+
+    <h3 id="api-gateway">API Gateway</h3>
+    <p><strong>Solves:</strong> centralized routing and cross-cutting concerns — without a gateway, every client needs to know the address of every backend service, and concerns like auth, rate limiting, and logging get duplicated into each service individually.</p>
+    <p>A single entry point that routes requests to the correct backend service and handles authentication, rate limiting, request/response transformation, and logging in one place. Related: a <strong>Reverse Proxy</strong> does the routing/forwarding piece without necessarily owning the cross-cutting policy layer — an API gateway is a reverse proxy with opinions.</p>
+    <p>A <strong>BFF (Backend for Frontend)</strong> takes this further with a dedicated gateway per client type (web, iOS, Android), each shaping responses exactly to that client's needs rather than forcing one generic API to serve all of them equally awkwardly.</p>
+
+    <h3 id="service-mesh">Service Mesh</h3>
+    <p><strong>Solves:</strong> service-to-service communication concerns (retries, timeouts, mTLS, observability, traffic splitting) at scale, without embedding that logic in every service's own codebase in every language they happen to be written in.</p>
+    <p>A sidecar proxy (Envoy is the most common) runs alongside every service instance and intercepts all its network traffic, applying policy uniformly regardless of what language the service itself is written in. Istio and Linkerd are control planes that configure the sidecars fleet-wide.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mesh-title">
+        <title id="mesh-title">Service mesh sidecar pattern</title>
+        <rect x="40" y="40" width="180" height="100" rx="10" fill="#fff" stroke="#181C22"/>
+        <text x="130" y="20" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#565F6B">Pod A</text>
+        <rect x="55" y="55" width="80" height="70" rx="6" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="95" y="94" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">Service A</text>
+        <rect x="145" y="55" width="60" height="70" rx="6" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="175" y="90" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#8C5E13">sidecar</text>
+
+        <path d="M220,90 L440,90" stroke="#565F6B" stroke-width="1.4"/>
+        <text x="330" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#565F6B">all traffic passes through sidecars</text>
+
+        <rect x="440" y="40" width="180" height="100" rx="10" fill="#fff" stroke="#181C22"/>
+        <text x="530" y="20" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#565F6B">Pod B</text>
+        <rect x="455" y="55" width="60" height="70" rx="6" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="485" y="90" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#8C5E13">sidecar</text>
+        <rect x="525" y="55" width="80" height="70" rx="6" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="565" y="94" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">Service B</text>
+
+        <text x="350" y="165" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#565F6B">Service A/B code has zero knowledge of retries, mTLS, or tracing — the sidecar owns all of it</text>
+      </svg>
+      <figcaption>The Sidecar pattern (see Advanced Patterns below) is the general mechanism; a service mesh is that mechanism applied specifically to networking concerns.</figcaption>
+    </figure>
+
+    <h3 id="blue-green">Blue-Green Deployment</h3>
+    <p><strong>Solves:</strong> zero-downtime releases — deploying a new version by replacing the old one in place risks a window where neither version is fully healthy.</p>
+    <p>Run two identical environments, "blue" (current production) and "green" (new version). Deploy and fully test the new version on green while blue keeps serving all live traffic, then switch the router to green atomically. If anything's wrong, switch back to blue instantly — the previous version is still running, not torn down.</p>
+
+    <h3 id="canary">Canary Deployment</h3>
+    <p><strong>Solves:</strong> safe rollout — blue-green switches 100% of traffic at once; canary reduces the blast radius of a bad release by exposing it to a small slice of real traffic first.</p>
+    <p>Route a small percentage of traffic (often 1–5%) to the new version, watch error rates and latency closely, and ramp up gradually if metrics stay healthy — or roll back instantly, affecting only that small slice, if they don't. <strong>Shadow Traffic</strong> goes a step further for the most cautious rollouts: mirror real production traffic to the new version without it affecting any real user, comparing its outputs against the current version silently.</p>
+
+    <h3 id="feature-flags">Feature Flags</h3>
+    <p><strong>Solves:</strong> controlled releases decoupled from deployment — without flags, "ship the code" and "turn on the feature" are the same event, which means the only way to disable a bad feature is another deploy.</p>
+    <p>Wrap new functionality in a runtime-checked flag so it can be toggled, gradually rolled out to a percentage of users, or targeted at specific segments — all without a new deploy. This also enables A/B testing and instant kill-switches for anything that turns out to be broken in production.</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: blue-green vs. canary — when would you choose one over the other?</div>
+      <div class="a"><p>Blue-green is faster to roll back completely (instant full switch, either direction) and simpler to reason about, but it's all-or-nothing — a subtle bug that only shows up under 1% of real traffic patterns won't surface until 100% of users hit it. Canary is slower to fully roll out but catches exactly that kind of subtle, traffic-dependent issue early, with a much smaller blast radius while you find out. Many real pipelines use both: canary first to catch problems early, then a blue-green-style full cutover once the canary's metrics look clean.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="reliability">
+      <div class="cat-label"><span class="dot g"></span>Category 8 — Reliability Patterns</div>
+    </div>
+    <h2><span class="num">§8</span>Reliability: doing exactly the right amount of work, exactly once (or knowing when you can't)</h2>
+    <p class="section-intro">Networks drop acknowledgments even when the underlying operation succeeded. This section is about the guarantees you can actually make when you can't always tell whether something already happened.</p>
+
+    <h3 id="idempotency">Idempotency</h3>
+    <p><strong>Solves:</strong> safe retries — if retrying an operation is going to be a core part of how the system handles failure (and it always is), that operation needs to produce the same result no matter how many times it's actually executed.</p>
+    <p>The standard mechanism is an <strong>idempotency key</strong>: the client generates a unique key per logical operation and sends it with the request; the server checks whether it's already processed that key and, if so, returns the original result instead of executing the operation again.</p>
+
+    <pre><code>def charge_card(idempotency_key, amount, card):
+    existing = db.get_by_idempotency_key(idempotency_key)
+    if existing:
+        return existing.result   # already processed -- return the original outcome
+    result = payment_processor.charge(amount, card)
+    db.save_idempotency_record(idempotency_key, result)
+    return result</code></pre>
+
+    <div class="callout amber">
+      <div class="callout-title"><span class="dot a"></span>Idempotent ≠ safe to call twice for free</div>
+      Idempotency guarantees the same <em>result</em>, not that the second call does nothing. A well-implemented idempotent charge endpoint still does a database lookup on every retry — it just skips re-running the actual charge. This is why idempotency keys need their own storage with a sensible retention window, not an assumption that duplicate calls are magically free.
+    </div>
+
+    <h3 id="delivery-guarantees">Delivery Guarantees: At-Least-Once, At-Most-Once, Exactly-Once</h3>
+    <p><strong>Solves:</strong> defining precisely what a messaging system promises about how many times a message will be delivered — a prerequisite for knowing what your consumer actually needs to defend against.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Guarantee</th><th>Behavior</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td>At-most-once</td><td>Send, don't confirm, move on</td><td>Message can be silently lost</td></tr>
+          <tr><td>At-least-once</td><td>Retry until acknowledged</td><td>Message can be delivered more than once</td></tr>
+          <tr><td>Exactly-once</td><td>Delivered and processed exactly one time, guaranteed</td><td>Genuinely hard to achieve end-to-end; usually really "at-least-once delivery + idempotent processing" underneath</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout blue">
+      <div class="callout-title"><span class="dot b"></span>"Exactly-once" is almost always a composed guarantee</div>
+      True exactly-once delivery across an unreliable network is provably very difficult (it runs into the same two-generals problem underlying 2PC's blocking issue). What most systems that advertise "exactly-once processing" actually deliver is at-least-once delivery paired with an idempotent consumer — the message might arrive twice, but processing it twice produces the same effect as processing it once, so the end result looks exactly-once even though the delivery mechanism isn't.
+    </div>
+
+    <h3 id="checkpointing">Checkpointing &amp; Snapshotting</h3>
+    <p><strong>Solves:</strong> recovery after a crash — without periodic checkpoints, a long-running stream processing job or stateful service has to replay its entire history from the beginning after any failure.</p>
+    <p>Periodically persist enough state to resume from that point rather than from the start — a stream processor saves its position in the input log plus any accumulated aggregation state; a database takes a full snapshot periodically so its write-ahead log doesn't have to be replayed from the beginning of time. Snapshotting is checkpointing applied to full system state rather than a single job's progress.</p>
+
+    <h3 id="health-checks">Health Checks &amp; Watchdog</h3>
+    <p><strong>Solves:</strong> detecting failures automatically rather than relying on a human noticing — the prerequisite for automated recovery, load balancer routing decisions, and orchestrator restart decisions.</p>
+    <div class="cards">
+      <div class="card">
+        <h4>Liveness vs. readiness</h4>
+        <p><strong>Liveness:</strong> "is this process running and not deadlocked?" A failed liveness check triggers a restart. <strong>Readiness:</strong> "can this instance currently serve traffic?" A failed readiness check just removes it from the load balancer's rotation — it might come back readily once, say, its cache warms up.</p>
+      </div>
+      <div class="card">
+        <h4>Watchdog</h4>
+        <p>A separate monitoring process that watches for hung or unresponsive processes and forcibly restarts them — a safety net for failure modes (deadlocks, infinite loops) that a process can't detect or fix in itself.</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q">Interview drill: your payment API needs to guarantee a customer is never double-charged, even if the network drops the response after a successful charge. What do you build?</div>
+      <div class="a"><p>The client generates an idempotency key per checkout attempt and sends it with the charge request. If the network drops the response, the client's retry logic (exponential backoff, per the Resilience section) retries with the <em>same</em> key. The server looks up that key before doing anything: if it's already been processed, it returns the stored result immediately without touching the payment processor again; if not, it processes the charge and stores the result keyed by that idempotency key. The client never needs to know whether its first attempt actually succeeded before the network dropped — the retry is safe by construction.</p></div>
+    </div>
+
+
+    <div class="cat-divider" id="scalability">
+      <div class="cat-label"><span class="dot a"></span>Category 9 — Scalability Patterns</div>
+    </div>
+    <h2><span class="num">§9</span>Scalability: adding capacity without adding coupling</h2>
+    <p class="section-intro">Scaling is easy in theory — add more machines — and hard in practice, because most of the difficulty is in the assumptions your system quietly baked in about running on exactly one machine.</p>
+
+    <h3 id="horiz-vert">Horizontal vs. Vertical Scaling</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>Vertical (scale up)</th><th>Horizontal (scale out)</th></tr></thead>
+        <tbody>
+          <tr><td>Method</td><td>Bigger machine — more CPU/RAM</td><td>More machines</td></tr>
+          <tr><td>Ceiling</td><td>Hard limit — biggest machine money buys</td><td>No practical ceiling</td></tr>
+          <tr><td>App changes needed</td><td>Usually none</td><td>Requires statelessness, load balancing, often data partitioning</td></tr>
+          <tr><td>Failure impact</td><td>One machine down = fully down</td><td>One instance down = reduced capacity, not outage</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Auto Scaling</strong> is horizontal scaling made dynamic: instance count adjusts automatically based on real-time load (CPU, queue depth, request rate) rather than a fixed, manually-set count — capacity grows to meet demand and shrinks back down when it passes, rather than being permanently provisioned for peak.</p>
+
+    <h3 id="stateless">Stateless Services</h3>
+    <p><strong>Solves:</strong> the actual prerequisite for horizontal scaling and load balancing to work at all — if a service holds session or request state in its own memory, requests from the same client must always land on the same instance, defeating the point of having many interchangeable instances.</p>
+    <p>Push state out of the application process entirely — into a shared cache, a database, or a token the client holds itself (a signed JWT, for instance) — so that any instance can handle any request. This is also precisely what makes Blue-Green and Canary deployments, and auto scaling in general, straightforward: instances become disposable and interchangeable.</p>
+
+    <h3 id="worker-pools">Worker Pools &amp; Thread/Connection Pools</h3>
+    <p><strong>Solves:</strong> controlled concurrency — creating a new thread or a new database connection per task is expensive (see the thread pool internals covered in Java concurrency guides); pools reuse a fixed, warm set instead.</p>
+    <p>A worker pool applies the same idea at the process or job level: a fixed number of worker processes pull tasks from a shared queue, giving parallel execution with a hard, predictable ceiling on total resource usage — the same shape as a thread pool, just at a coarser grain. <strong>Microservices</strong> apply the same underlying idea at the architecture level: splitting a system so each piece can be scaled independently, based on its own specific load, rather than scaling one large monolith uniformly regardless of which part is actually the bottleneck.</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: why is statelessness described as a prerequisite for scaling, not a scaling pattern itself?</div>
+      <div class="a"><p>Because none of horizontal scaling, load balancing (beyond trivial round robin with no session affinity), auto scaling, or blue-green/canary deployment actually work correctly if an instance holds state that only it has. A stateful instance can't be freely replaced, added, or removed without losing or stranding that state — which is exactly what all of those other patterns need to be able to do at will. Statelessness isn't one tool among many; it's the property that makes the rest of the toolbox usable.</p></div>
+    </div>
+
+  
+    <div class="cat-divider" id="security">
+      <div class="cat-label"><span class="dot p"></span>Category 10 — Security Patterns</div>
+    </div>
+    <h2><span class="num">§10</span>Security: who is this, and what are they allowed to do</h2>
+    <p class="section-intro">Every distributed system eventually needs to answer two separate questions for every request: who is making it (authentication), and what are they allowed to do (authorization) — plus, once you have more than one service, how services trust each other.</p>
+
+    <h3 id="authn-authz">OAuth2, JWT, RBAC, ABAC, API Keys</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Mechanism</th><th>Solves</th></tr></thead>
+        <tbody>
+          <tr><td>OAuth2</td><td>Delegated authorization — letting an app act on a user's behalf without ever seeing their password</td></tr>
+          <tr><td>JWT</td><td>Stateless auth — a signed token carrying identity/claims, verifiable without a database lookup on every request</td></tr>
+          <tr><td>RBAC</td><td>Role-based permissions — "admins can delete, viewers can only read"</td></tr>
+          <tr><td>ABAC</td><td>Attribute-based permissions — finer-grained rules like "can edit if owner AND document is unlocked"</td></tr>
+          <tr><td>API Keys</td><td>Simple service-to-service or third-party auth, no user context needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout amber">
+      <div class="callout-title"><span class="dot a"></span>A JWT's statelessness is also its risk</div>
+      Because a JWT is self-contained and verified by signature alone, revoking one before its expiry is genuinely awkward — there's no central "is this token still valid?" check by design. Short expiry times plus a refresh-token flow are the usual mitigation, trading a little complexity back in exchange for bounding how long a compromised token stays useful.
+    </div>
+
+    <h3 id="secrets-mtls">mTLS &amp; Secrets Management</h3>
+    <p><strong>mTLS (mutual TLS)</strong> solves service authentication in the reverse direction from normal TLS: not just the client verifying the server's certificate, but the server also verifying the client's — the foundation of "zero trust" service-to-service communication inside a service mesh, where no internal call is trusted just because it originated inside the network perimeter.</p>
+    <p><strong>Secrets Management</strong> solves credential storage: database passwords, API keys, and certificates need to exist somewhere, and "hardcoded in a config file checked into git" is the single most common real-world security failure. A dedicated secrets manager (Vault, AWS Secrets Manager) stores them encrypted, controls access via policy, and can rotate them automatically.</p>
+
+    <div class="cat-divider" id="observability">
+      <div class="cat-label"><span class="dot b"></span>Category 11 — Observability Patterns</div>
+    </div>
+    <h2><span class="num">§11</span>Observability: understanding a system you cannot fully see</h2>
+    <p class="section-intro">In a distributed system, no single machine has the whole picture of what happened for any given request. Observability patterns are how you reconstruct that picture after the fact.</p>
+
+    <h3 id="tracing">Distributed Tracing &amp; Correlation IDs</h3>
+    <p><strong>Solves:</strong> request tracking across service boundaries — a single user request in a microservices architecture might touch a dozen services, and understanding where time was actually spent (or where it failed) requires following that one request's path across all of them.</p>
+    <p>A <strong>correlation ID</strong> is generated at the edge and passed through every downstream call, tagging every log line and span with the same identifier so they can all be reassembled later. <strong>Distributed tracing</strong> (Jaeger, Zipkin) builds on this: each service creates a "span" recording how long its part took, and spans are linked into a full trace showing the request's entire path and timing, service by service.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="trace-title">
+        <title id="trace-title">A distributed trace as a waterfall of spans</title>
+        <text x="20" y="20" font-family="Space Grotesk" font-size="11" fill="#565F6B">trace_id: 8f3a...  (one request, reassembled from every service it touched)</text>
+        <rect x="20" y="34" width="640" height="24" rx="4" fill="#DFE6F9" stroke="#2C5FD1"/>
+        <text x="30" y="50" font-family="IBM Plex Mono" font-size="10" fill="#1F3A93">API Gateway — 210ms total</text>
+        <rect x="40" y="64" width="380" height="22" rx="4" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="50" y="79" font-family="IBM Plex Mono" font-size="9.5" fill="#1F6B47">Order Service — 160ms</text>
+        <rect x="60" y="92" width="180" height="20" rx="4" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="68" y="106" font-family="IBM Plex Mono" font-size="9" fill="#8C5E13">Inventory check — 70ms</text>
+        <rect x="250" y="92" width="150" height="20" rx="4" fill="#F7E4E3" stroke="#C7454A"/>
+        <text x="258" y="106" font-family="IBM Plex Mono" font-size="9" fill="#8E2E32">Payment — 90ms (slow!)</text>
+      </svg>
+      <figcaption>Without a shared trace ID, this exact breakdown — which downstream call actually cost the 90ms — would require manually correlating timestamps across three separate services' logs.</figcaption>
+    </figure>
+
+    <h3 id="logging-metrics">Structured Logging &amp; Metrics</h3>
+    <p><strong>Structured Logging</strong> solves searchable logs: plain-text log lines are only searchable by string matching; logging as structured key-value data (JSON) makes logs queryable by field — "show me every request with <code>status=500</code> and <code>service=payment</code>" — rather than grepping for substrings.</p>
+    <p><strong>Metrics</strong> solve system health at a glance: counters, gauges, and histograms (request rate, error rate, p50/p95/p99 latency) aggregated over time, cheap enough to collect at high volume and query in real time, unlike full log lines. <strong>OpenTelemetry</strong> has become the de facto standard for emitting all three — traces, logs, and metrics — through one unified, vendor-neutral instrumentation layer.</p>
+
+    <div class="qa">
+      <div class="q">Interview drill: a request is slow. Would you reach for metrics or a distributed trace first, and why?</div>
+      <div class="a"><p>Metrics first — they tell you <em>that</em> something is slow and roughly which service or endpoint, cheaply, across all traffic, and they're what your alerting is watching anyway. A distributed trace is the tool for <em>why</em> a specific request was slow: once metrics point at "payment service p99 spiked," pulling a trace for one of the affected requests shows exactly which downstream call inside payment actually ate the time. Metrics find the haystack; tracing finds the needle once you're already looking in the right one.</p></div>
+    </div>
+
+    <div class="cat-divider" id="advanced">
+      <div class="cat-label"><span class="dot r"></span>Category 12 — Advanced &amp; Structural Patterns</div>
+    </div>
+    <h2 id="advanced-patterns"><span class="num">§12</span>Advanced patterns: the vocabulary for everything else</h2>
+    <p class="section-intro">These don't fit neatly into one failure category — they're structural patterns for organizing code and traffic that show up constantly once a system has any real size.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>Request Coalescing / SingleFlight</h4>
+        <p>If N identical concurrent requests arrive for the same uncached key, execute the underlying work exactly once and fan the single result out to all N callers — directly related to Cache Stampede Prevention, generalized beyond just caching.</p>
+      </div>
+      <div class="card">
+        <h4>Write Coalescing</h4>
+        <p>Batch multiple small writes to the same target into one larger write, trading a little latency for dramatically fewer, more efficient I/O operations.</p>
+      </div>
+      <div class="card">
+        <h4>Fan-Out/Fan-In &amp; Scatter-Gather</h4>
+        <p>Dispatch one request to many downstream services in parallel (fan-out/scatter), then merge their independent results into one response (fan-in/gather) — the shape behind most search and aggregation endpoints.</p>
+      </div>
+      <div class="card">
+        <h4>Strangler Fig Pattern</h4>
+        <p>Incrementally replace a legacy system by routing an ever-growing slice of traffic to new services while the old monolith keeps serving the rest — until eventually nothing depends on the original system and it can be retired.</p>
+      </div>
+      <div class="card">
+        <h4>Sidecar Pattern</h4>
+        <p>Deploy a helper process alongside a main service (same pod, same lifecycle) to handle a cross-cutting concern like logging, proxying, or config — the general mechanism behind a service mesh's per-instance proxy.</p>
+      </div>
+      <div class="card">
+        <h4>Ambassador Pattern</h4>
+        <p>A specific flavor of sidecar dedicated to representing outbound network calls on the main service's behalf — handling retries, circuit breaking, or protocol translation for calls the main service makes, without the main service's own code needing to know.</p>
+      </div>
+      <div class="card">
+        <h4>Anti-Corruption Layer</h4>
+        <p>A translation layer between a new system's clean domain model and a legacy system's messier one, so the legacy system's quirks and inconsistencies don't leak into and corrupt the new system's design.</p>
+      </div>
+      <div class="card">
+        <h4>Choreography vs. Orchestration</h4>
+        <p>Covered under Saga above — the general question of whether coordination emerges from services reacting to each other's events, or is directed by a central controller.</p>
+      </div>
+      <div class="card">
+        <h4>Event-Carried State Transfer</h4>
+        <p>Events carry the full changed state, not just an "X happened, go look it up" notification — so a downstream consumer can update its own local copy without an extra synchronous call back to the source.</p>
+      </div>
+      <div class="card">
+        <h4>Command Pattern</h4>
+        <p>Encapsulate an action as an object (with its own parameters and execute method) rather than a direct method call — the classic OOP building block underneath queued tasks, undo/redo, and job scheduling.</p>
+      </div>
+      <div class="card">
+        <h4>Repository &amp; Unit of Work</h4>
+        <p>Repository abstracts data access behind a domain-friendly interface, hiding the actual storage mechanism. Unit of Work groups several such changes into one atomic save, tracking everything modified in a business operation and committing it together.</p>
+      </div>
+      <div class="card">
+        <h4>Proxy &amp; Adapter Pattern</h4>
+        <p>Proxy stands in for another object to control or augment access to it (lazy loading, access control, caching). Adapter converts one interface into another a caller already expects — the standard tool for integrating a system that speaks a different "shape" than the one your code was written against.</p>
+      </div>
+    </div>
+
+    <h2 id="cheatsheet">Cheat sheet: symptom → pattern</h2>
+    <div class="cheat">
+      <table class="cheat-table">
+        <tbody>
+          <tr><th>Symptom</th><th>Reach for</th></tr>
+          <tr><td>Retries all firing at once, worsening an outage</td><td>Exponential Backoff + Jitter</td></tr>
+          <tr><td>One dead dependency cascading into total outage</td><td>Circuit Breaker + Bulkhead</td></tr>
+          <tr><td>Requests hanging forever on a stuck dependency</td><td>Timeout (with a budget across the call chain)</td></tr>
+          <tr><td>A client sending far more requests than intended</td><td>Rate Limiting — Token Bucket for bursty, Leaky Bucket for strict</td></tr>
+          <tr><td>System falling over entirely under peak load</td><td>Load Shedding + Priority Queue</td></tr>
+          <tr><td>Cache expiring and every request hammering the DB at once</td><td>Cache Stampede Prevention (single-flight / early refresh)</td></tr>
+          <tr><td>Repeated lookups for keys that don't exist</td><td>Bloom Filter</td></tr>
+          <tr><td>One business operation spanning several services, no shared transaction</td><td>Saga Pattern + Outbox Pattern</td></tr>
+          <tr><td>Consumer might see the same message twice</td><td>Idempotent Consumer + Idempotency keys</td></tr>
+          <tr><td>Database too large / too hot for one node</td><td>Sharding + Consistent Hashing</td></tr>
+          <tr><td>Reads far outnumber writes</td><td>Read Replicas + Cache Aside</td></tr>
+          <tr><td>Need exactly one coordinator, no split-brain</td><td>Leader Election (built on Consensus)</td></tr>
+          <tr><td>Multi-machine mutual exclusion</td><td>Distributed Lock — with fencing tokens</td></tr>
+          <tr><td>Releasing new code without downtime or big-bang risk</td><td>Blue-Green for instant cutover, Canary for gradual, cautious rollout</td></tr>
+          <tr><td>Can't tell why one specific request was slow</td><td>Distributed Tracing + Correlation IDs</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="resources">Resources</h2>
+    <div class="ref-group">
+      <div class="group-title">Foundational papers</div>
+      <ul>
+        <li>Google — "The Tail at Scale" (hedged requests, tail latency at scale)</li>
+        <li>Amazon — the original Dynamo paper (vector clocks, quorum, eventual consistency)</li>
+        <li>Ongaro &amp; Ousterhout — "In Search of an Understandable Consensus Algorithm" (Raft)</li>
+        <li>Lamport — the original Paxos papers</li>
+      </ul>
+    </div>
+    <div class="ref-group">
+      <div class="group-title">Books</div>
+      <ul>
+        <li><em>Designing Data-Intensive Applications</em> — Martin Kleppmann — the definitive modern text on almost everything in the Database and Distributed Systems sections above</li>
+        <li><em>Release It!</em> — Michael Nygard — the original popularizer of Circuit Breaker and Bulkhead in production contexts</li>
+        <li><em>Enterprise Integration Patterns</em> — Hohpe &amp; Woolf — the source for most of the Messaging section's vocabulary</li>
+      </ul>
+    </div>
+    <div class="ref-group">
+      <div class="group-title">Practice</div>
+      <ul>
+        <li>Read the source of a resilience library (resilience4j, Polly, Hystrix's retired-but-still-instructive codebase) against the Circuit Breaker and Bulkhead sections above</li>
+        <li>Trace one real request through a system you work on and identify which of these 50+ patterns are already quietly present in the path — most production systems use far more of this list than any single engineer realizes</li>
+      </ul>
+    </div>
+
+  </article>
+</div>
+
+<hr class="rule" style="max-width:1180px; margin:0 auto;">
+
+<footer>
+  <p>This is a living reference. Pattern names and exact mechanics vary slightly across sources — treat the tables and diagrams here as a map for building intuition, and verify exact implementation details (client libraries, broker semantics, specific consensus protocol guarantees) against current official docs before shipping.</p>
+</footer>
+
+<script>
+  const links = Array.from(document.querySelectorAll('.toc a'));
+  const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 100;
+    sections.forEach((s, i) => { if(s && s.offsetTop <= y) idx = i; });
+    links.forEach((a,i) => a.classList.toggle('active', i === idx));
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+</script>
+</body>
+</html>
