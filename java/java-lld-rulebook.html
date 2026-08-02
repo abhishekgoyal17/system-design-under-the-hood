@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLD + Java Interview Rulebook — The Complete Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F5F0; --paper-2:#ECEEE7; --ink:#181C22; --ink-soft:#565F6B; --line:#D8DBD1;
+    --panel:#171B22; --panel-2:#20252E; --panel-text:#E9EBEE;
+    --red:#C7454A; --red-bg:#F7E4E3; --amber:#C8862B; --amber-bg:#F6E9D3;
+    --green:#2F8F63; --green-bg:#DDEFE4; --blue:#2C5FD1; --blue-bg:#DFE6F9;
+    --purple:#7A54C9; --purple-bg:#EAE2F7;
+    --radius:10px; --maxw:760px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'Source Serif 4', Georgia, serif; font-size:18px; line-height:1.65; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4,.eyebrow,nav,.chip{font-family:'Space Grotesk', sans-serif;}
+  code, pre, .cheat-table td, .cheat-table th{font-family:'IBM Plex Mono', monospace;}
+  a{color:var(--blue);} a:hover{color:var(--ink);}
+
+  .signal{display:inline-flex; gap:5px; align-items:center;}
+  .signal span{width:9px;height:9px;border-radius:50%;display:inline-block; box-shadow:0 0 0 1px rgba(0,0,0,.08) inset;}
+  .signal .r{background:var(--red);} .signal .a{background:var(--amber);} .signal .g{background:var(--green);}
+
+  .topnav{position:sticky; top:0; z-index:50; background:rgba(244,245,240,.88); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:14px 24px; display:flex; align-items:center; justify-content:space-between;}
+  .topnav .brand{font-weight:600; font-size:14px; display:flex; gap:8px; align-items:center; color:var(--ink); text-decoration:none;}
+  .topnav a.back{font-size:14px; text-decoration:none; color:var(--ink-soft); font-family:'Space Grotesk',sans-serif;}
+  .topnav a.back:hover{color:var(--ink);}
+
+  .hero{background:var(--panel); color:var(--panel-text); padding:88px 24px 76px; position:relative; overflow:hidden;}
+  .hero-inner{max-width:var(--maxw); margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{text-transform:uppercase; font-size:12.5px; letter-spacing:.16em; color:#9AA3B0; font-weight:600; margin-bottom:22px; display:flex; align-items:center; gap:10px;}
+  .hero h1{font-size:40px; line-height:1.14; font-weight:700; margin:0 0 22px; letter-spacing:-0.01em; max-width:15em;}
+  .hero .dek{font-family:'Source Serif 4', serif; font-size:19px; line-height:1.6; color:#C4C9D2; max-width:38em; margin:0 0 30px;}
+  .byline{font-family:'Space Grotesk',sans-serif; font-size:13.5px; color:#8B93A0; display:flex; gap:18px; flex-wrap:wrap; align-items:center;}
+  .byline strong{color:#D7DAE1; font-weight:600;}
+  .hero-graphic{position:absolute; right:-60px; top:50%; transform:translateY(-50%); width:320px; height:320px; opacity:.9; z-index:1;}
+  @media (max-width:900px){ .hero-graphic{display:none;} }
+
+  .layout{max-width:1180px; margin:0 auto; padding:56px 24px 100px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+  @media (max-width:980px){ .layout{grid-template-columns:1fr; padding:40px 20px 80px;} .toc{display:none;} }
+  .toc{position:sticky; top:76px; align-self:start; font-family:'Space Grotesk',sans-serif; font-size:12.5px; max-height:calc(100vh - 100px); overflow-y:auto;}
+  .toc .toc-label{text-transform:uppercase; letter-spacing:.12em; font-size:11px; color:var(--ink-soft); font-weight:600; margin-bottom:14px;}
+  .toc .toc-cat{text-transform:uppercase; letter-spacing:.08em; font-size:10.5px; color:var(--ink-soft); font-weight:700; margin:16px 0 4px;}
+  .toc ol{list-style:none; margin:0; padding:0; border-left:1px solid var(--line);}
+  .toc a{display:block; padding:4px 0 4px 16px; color:var(--ink-soft); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; transition:color .15s, border-color .15s;}
+  .toc a:hover{color:var(--ink); border-left-color:var(--line);}
+  .toc a.active{color:var(--ink); border-left-color:var(--blue); font-weight:600;}
+
+  article{max-width:var(--maxw);}
+  article h2{font-size:26px; font-weight:700; margin:64px 0 6px; letter-spacing:-0.005em; scroll-margin-top:84px; display:flex; align-items:center;}
+  article h2 .num{color:var(--ink-soft); font-weight:500; margin-right:10px; font-size:.7em;}
+  article h3{font-size:19px; font-weight:600; margin:34px 0 10px; scroll-margin-top:84px;}
+  article h4{font-size:14.5px; font-weight:700; margin:22px 0 8px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);}
+  article p{margin:0 0 18px;}
+  article ul, article ol{margin:0 0 18px; padding-left:22px;}
+  article li{margin-bottom:6px;}
+  .section-intro{color:var(--ink-soft); font-size:17px;}
+  .cat-divider{margin:88px 0 0; padding-top:24px; border-top:3px solid var(--ink);}
+  .cat-divider .cat-label{font-family:'Space Grotesk',sans-serif; text-transform:uppercase; letter-spacing:.14em; font-size:12.5px; color:var(--ink-soft); font-weight:700; display:flex; align-items:center; gap:10px;}
+
+  strong{font-weight:600;}
+  code{background:var(--paper-2); border:1px solid var(--line); border-radius:4px; padding:1.5px 6px; font-size:.85em; color:#1F3A93;}
+  pre{background:var(--panel); color:var(--panel-text); border-radius:var(--radius); padding:18px 20px; overflow-x:auto; font-size:13.2px; line-height:1.6; margin:22px 0;}
+  pre code{background:none; border:none; padding:0; color:inherit; font-size:1em;}
+  .pre-label{font-family:'Space Grotesk',sans-serif; font-size:11.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin:26px 0 -8px;}
+
+  blockquote{margin:22px 0; padding:14px 20px; border-left:3px solid var(--blue); background:var(--blue-bg); border-radius:0 8px 8px 0; font-size:16.5px; color:#1B2A4D;}
+  blockquote p{margin:0;}
+
+  .callout{border:1px solid var(--line); background:#fff; border-radius:var(--radius); padding:22px 24px; margin:26px 0;}
+  .callout-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .callout.green{border-color:#BFDECB; background:var(--green-bg);} .callout.green .callout-title{color:#1F6B47;}
+  .callout.amber{border-color:#E7CE9E; background:var(--amber-bg);} .callout.amber .callout-title{color:#8C5E13;}
+  .callout.red{border-color:#E9BFC0; background:var(--red-bg);} .callout.red .callout-title{color:#8E2E32;}
+  .callout.blue{border-color:#C3D2F5; background:var(--blue-bg);} .callout.blue .callout-title{color:#1F3A93;}
+  .callout.purple{border-color:#D3C2EC; background:var(--purple-bg);} .callout.purple .callout-title{color:#4E3080;}
+
+  figure.diagram{margin:28px 0 32px; padding:22px 20px 16px; background:#fff; border:1px solid var(--line); border-radius:var(--radius);}
+  figure.diagram svg{width:100%; height:auto; display:block;}
+  figure.diagram figcaption{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--ink-soft); margin-top:10px; text-align:center;}
+
+  .tablewrap{overflow-x:auto; margin:22px 0;}
+  table{border-collapse:collapse; width:100%; font-size:14.5px;}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--paper-2); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
+  td.center, th.center{text-align:center;}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+  .dot.r{background:var(--red);} .dot.a{background:var(--amber);} .dot.g{background:var(--green);} .dot.b{background:var(--blue);} .dot.p{background:var(--purple);}
+
+  .chip{display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.02em;}
+  .chip.g{background:var(--green-bg); color:#1F6B47;} .chip.a{background:var(--amber-bg); color:#8C5E13;}
+  .chip.r{background:var(--red-bg); color:#8E2E32;} .chip.b{background:var(--blue-bg); color:#1F3A93;} .chip.p{background:var(--purple-bg); color:#4E3080;}
+
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0;}
+  @media (max-width:640px){ .cards{grid-template-columns:1fr;} }
+  .card{border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; background:#fff;}
+  .card h4{margin:0 0 4px; font-family:'Space Grotesk',sans-serif; font-size:15.5px; font-weight:700; text-transform:none; letter-spacing:0; color:var(--ink);}
+  .card .sub{color:var(--ink-soft); font-size:13px; margin-bottom:12px; font-family:'Space Grotesk',sans-serif;}
+  .card ul{padding-left:18px; margin:0; font-size:14.5px;}
+  .card li{margin-bottom:5px;}
+  .card p{font-size:14.5px; margin:0;}
+
+  .modebadge{display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--panel); color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; margin-right:12px; flex:none;}
+
+  .qa{border:1px solid var(--line); border-radius:var(--radius); background:#fff; padding:18px 20px; margin:16px 0;}
+  .qa .q{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15.5px; margin-bottom:8px; color:var(--ink);}
+  .qa .a{font-size:15.5px; margin:0;}
+  .qa .a p{margin:0 0 10px;}
+  .qa .a p:last-child{margin-bottom:0;}
+
+  .cheat{background:var(--panel); color:var(--panel-text); border-radius:var(--radius); padding:8px; margin:28px 0;}
+  .cheat-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .cheat-table td, .cheat-table th{border:1px solid #333A45; padding:10px 12px; text-align:left;}
+  .cheat-table th{background:var(--panel-2); color:#B9C0CC; font-weight:600;}
+
+  .say-it{border:1.5px solid var(--ink); border-radius:var(--radius); background:#fff; padding:16px 20px; margin:22px 0; position:relative; padding-left:52px;}
+  .say-it::before{content:"SAY"; position:absolute; left:14px; top:16px; font-family:'Space Grotesk',sans-serif; font-size:10px; font-weight:700; letter-spacing:.08em; color:#fff; background:var(--ink); padding:3px 7px; border-radius:5px;}
+  .say-it em{font-style:italic; color:var(--ink);}
+
+  hr.rule{border:none; border-top:1px solid var(--line); margin:56px 0;}
+  footer{max-width:var(--maxw); margin:0 auto; padding:0 24px 90px; font-size:14px; color:var(--ink-soft);}
+  footer a{color:var(--ink-soft); text-decoration:underline;}
+  .ref-group{margin-top:20px;}
+  .ref-group .group-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink); margin-bottom:8px;}
+  .ref-group ul{padding-left:18px; margin:0;}
+  .ref-group li{margin-bottom:5px;}
+
+  ::selection{background:#CFE0FF;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="../index.html">
+    <span class="signal"><span class="r"></span><span class="a"></span><span class="g"></span></span>
+    System Notes
+  </a>
+  <a class="back" href="../index.html">← All guides</a>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">
+      <span class="signal"><span class="r"></span><span class="a"></span><span class="g"></span></span>
+      Interview&nbsp;Prep&nbsp;/&nbsp;Low-Level&nbsp;Design&nbsp;&amp;&nbsp;Java
+    </div>
+    <h1>The LLD + Java Interview Rulebook</h1>
+    <p class="dek">A 12-step algorithm for any Low-Level Design interview — requirements, entity identification, UML, folder structure, code, concurrency, patterns, SOLID, edge cases, logging, and scaling. Follow every step in order. Call out each step by name. This is the playbook, not a reference to skim.</p>
+    <div class="byline">
+      <span><strong>Format</strong> 12 sequential steps</span>
+      <span><strong>Total time</strong> ~25–35 min in-interview</span>
+      <span><strong>Stack</strong> Java</span>
+    </div>
+  </div>
+  <svg class="hero-graphic" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="60" cy="60" r="7" fill="#2F8F63"/>
+    <path d="M60,67 L60,120" stroke="#2A3040" stroke-width="1.4"/>
+    <circle cx="60" cy="127" r="7" fill="#C8862B"/>
+    <path d="M60,134 L60,187" stroke="#2A3040" stroke-width="1.4"/>
+    <circle cx="60" cy="194" r="7" fill="#2C5FD1"/>
+    <path d="M60,201 L60,254" stroke="#2A3040" stroke-width="1.4"/>
+    <circle cx="60" cy="261" r="7" fill="#C7454A"/>
+    <text x="80" y="65" font-family="IBM Plex Mono" font-size="11" fill="#8B93A0">requirements</text>
+    <text x="80" y="132" font-family="IBM Plex Mono" font-size="11" fill="#8B93A0">entities + UML</text>
+    <text x="80" y="199" font-family="IBM Plex Mono" font-size="11" fill="#8B93A0">code + patterns</text>
+    <text x="80" y="266" font-family="IBM Plex Mono" font-size="11" fill="#8B93A0">edge cases + scale</text>
+  </svg>
+</header>
+
+<div class="layout">
+  <nav class="toc" id="toc">
+    <div class="toc-label">The 12 steps</div>
+    <ol>
+      <li><a href="#step1">1. Clarify requirements</a></li>
+      <li><a href="#entity-framework">— Entity identification framework</a></li>
+      <li><a href="#step2">2. Draw class diagram</a></li>
+      <li><a href="#step3">3. Draw sequence diagram</a></li>
+      <li><a href="#step4">4. Define relationships</a></li>
+      <li><a href="#step5">5. Folder structure</a></li>
+      <li><a href="#step6">6. Write core code</a></li>
+      <li><a href="#step7">7. Concurrency</a></li>
+      <li><a href="#step8">8. Design patterns</a></li>
+      <li><a href="#step9">9. Design principles (SOLID)</a></li>
+      <li><a href="#step10">10. Edge case checklist</a></li>
+      <li><a href="#step11">11. Logging</a></li>
+      <li><a href="#step12">12. Scaling discussion</a></li>
+    </ol>
+    <div class="toc-cat">Reference</div>
+    <ol>
+      <li><a href="#cheatsheet">Quick-reference cheat sheet</a></li>
+    </ol>
+  </nav>
+
+  <article>
+    <p class="section-intro">This is a procedure, not a topic list — run it top to bottom, in an interview, out loud. Every step has a line to say before you start it, so the interviewer always knows what phase you're in and why. Skipping a step is the single most common way this kind of interview goes sideways: not because the code was wrong, but because the interviewer couldn't follow the reasoning.</p>
+
+    <h2 id="step1"><span class="modebadge">01</span>Clarify Requirements <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">2–3 min</span></h2>
+
+    <div class="say-it">
+      <em>"Before jumping into implementation, let me clarify both functional and non-functional requirements."</em>
+    </div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="req-title">
+        <title id="req-title">Functional vs non-functional requirements feed different design decisions</title>
+        <rect x="20" y="30" width="300" height="70" rx="8" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="170" y="55" text-anchor="middle" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#1F6B47">Functional Requirements</text>
+        <text x="170" y="75" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">What the system DOES</text>
+        <path d="M170,100 L170,130" stroke="#2F8F63" stroke-width="1.4"/>
+        <text x="170" y="150" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#1F6B47">→ entities, methods, relationships</text>
+
+        <rect x="380" y="30" width="300" height="70" rx="8" fill="#F6E9D3" stroke="#C8862B" stroke-width="1.5"/>
+        <text x="530" y="55" text-anchor="middle" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#8C5E13">Non-Functional Requirements</text>
+        <text x="530" y="75" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#8C5E13">How the system BEHAVES</text>
+        <path d="M530,100 L530,130" stroke="#C8862B" stroke-width="1.4"/>
+        <text x="530" y="150" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#8C5E13">→ data structures, patterns, concurrency</text>
+      </svg>
+      <figcaption>Both feed the same design — but they feed different parts of it. This split is why the two get gathered separately, in this order.</figcaption>
+    </figure>
+
+    <h3>Part A — Functional Requirements (What the system DOES)</h3>
+    <div class="say-it"><em>"First, let me understand the core use cases."</em></div>
+
+    <p>Ask:</p>
+    <ul>
+      <li>Who are the <strong>actors</strong>? (User, Admin, Driver, System, Guest)</li>
+      <li>What <strong>actions</strong> can each actor perform?</li>
+      <li>What is the <strong>primary happy path</strong> end to end?</li>
+      <li>Are there <strong>secondary use cases</strong>? (cancel, refund, search, review)</li>
+      <li>Any features that are explicitly <strong>out of scope</strong>?</li>
+    </ul>
+    <blockquote><p>Write these as: <em>"The system shall allow [actor] to [action]."</em></p></blockquote>
+
+    <div class="pre-label">Example output</div>
+    <pre><code>Functional Requirements:
+- User can browse and search items
+- User can add items to cart
+- User can place an order
+- User can cancel an order (only if status = PENDING)
+- User can view order history
+- Admin can update inventory
+- System sends notification on order confirmation</code></pre>
+
+    <h3>Part B — Non-Functional Requirements (How the system BEHAVES)</h3>
+    <div class="say-it"><em>"Now let me clarify the quality constraints."</em></div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Area</th><th>Questions to ask</th></tr></thead>
+        <tbody>
+          <tr><td>Scale</td><td>How many users? Expected RPS? Read-heavy or write-heavy?</td></tr>
+          <tr><td>Concurrency</td><td>Can multiple users/threads access the same resource simultaneously?</td></tr>
+          <tr><td>Consistency</td><td>Strong or eventual consistency? (e.g., seat booking must be strongly consistent)</td></tr>
+          <tr><td>Latency</td><td>Any SLA? Response time target? (e.g., &lt; 200ms)</td></tr>
+          <tr><td>Availability</td><td>99.9% uptime? Can the system go down briefly?</td></tr>
+          <tr><td>Durability</td><td>In-memory OK or must data survive restart?</td></tr>
+          <tr><td>Idempotency</td><td>Should the same request twice produce the same result?</td></tr>
+          <tr><td>Extensibility</td><td>Will new types / strategies be added later? (drives pattern choice)</td></tr>
+          <tr><td>Failure Handling</td><td>What happens on partial failure? Retry? Rollback? Compensate?</td></tr>
+          <tr><td>Scope</td><td>Single JVM or distributed? External DB or in-memory?</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pre-label">Example output</div>
+    <pre><code>Non-Functional Requirements:
+- In-memory storage (single JVM, no external DB)
+- Concurrent access expected -- thread safety required
+- Order placement must be idempotent (same requestId = same result)
+- Payment strategy must be extensible (Credit, UPI, Wallet)
+- Cancellation only allowed in PENDING state (state validation required)</code></pre>
+
+    <div class="callout green">
+      <div class="callout-title"><span class="dot g"></span>Output of Step 1 — state these aloud before moving on</div>
+      <pre style="margin:12px 0 0;"><code>"Based on my understanding:
+
+Functional:
+  1. User can place, cancel, and view orders
+  2. Admin can manage inventory
+  3. System notifies user on status change
+
+Non-Functional:
+  1. In-memory, single JVM
+  2. Concurrent access -- I'll use ConcurrentHashMap + locks
+  3. Idempotent order placement -- requestId dedup
+  4. Payment is extensible -- I'll use Strategy pattern
+  5. Order has lifecycle -- I'll use State pattern
+
+Let me proceed with these assumptions unless you'd like to change anything."</code></pre>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-title"><span class="dot b"></span>Why this matters</div>
+      Functional requirements decide your <strong>entities, methods, and relationships</strong>. Non-functional requirements decide your <strong>data structures, design patterns, and concurrency approach</strong>. Every pattern and tool choice you make in Steps 6–8 traces back to something you wrote down here — that traceability is exactly what a senior-level answer sounds like.
+    </div>
+
+
+    <div class="cat-divider" id="entity-framework">
+      <div class="cat-label"><span class="dot r"></span>The Core Skill</div>
+    </div>
+    <h2><span class="num">§</span>The Entity Identification Framework</h2>
+    <p class="section-intro">This is the core skill most candidates struggle with. It's not intuition — it's a repeatable algorithm. Run these four steps on any problem statement and the entities fall out.</p>
+
+    <h3>Step 1 — Noun Extraction Filter</h3>
+    <p>Read the problem statement and underline every noun. Then apply this three-question filter to each one:</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Question</th><th>If YES →</th><th>If NO →</th></tr></thead>
+        <tbody>
+          <tr><td>Does it have its own <strong>identity</strong> (unique ID)?</td><td>Strong Entity candidate</td><td>Might be a value object / field</td></tr>
+          <tr><td>Does it have <strong>state that changes</strong> over time?</td><td>Definite Entity</td><td>Might be just an enum / constant</td></tr>
+          <tr><td>Does it have <strong>behavior</strong> (does things or things happen to it)?</td><td>Needs its own class</td><td>Might be a field on another entity</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Step 2 — The 4 Entity Archetypes</h3>
+    <p>Every entity in any LLD problem falls into one of these four buckets.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arch-title">
+        <title id="arch-title">The four entity archetypes</title>
+        <rect x="20" y="10" width="660" height="95" rx="8" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="40" y="34" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#1F6B47">ARCHETYPE 1 — The ACTOR</text>
+        <text x="40" y="54" font-family="Space Grotesk" font-size="11.5" fill="#1F6B47">Who uses / interacts with the system?</text>
+        <text x="40" y="74" font-family="IBM Plex Mono" font-size="10.5" fill="#1F6B47">Examples: User, Customer, Driver, Admin, Agent</text>
+        <text x="40" y="92" font-family="IBM Plex Mono" font-size="10.5" fill="#1F6B47">Always has: id, name, contact info, role/status</text>
+
+        <rect x="20" y="115" width="660" height="95" rx="8" fill="#DFE6F9" stroke="#2C5FD1" stroke-width="1.5"/>
+        <text x="40" y="139" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#1F3A93">ARCHETYPE 2 — The RESOURCE</text>
+        <text x="40" y="159" font-family="Space Grotesk" font-size="11.5" fill="#1F3A93">What is being managed / allocated / consumed?</text>
+        <text x="40" y="179" font-family="IBM Plex Mono" font-size="10.5" fill="#1F3A93">Examples: ParkingSpot, Seat, Room, Book, Ticket</text>
+        <text x="40" y="197" font-family="IBM Plex Mono" font-size="10.5" fill="#1F3A93">Always has: id, availability status, type/category</text>
+
+        <rect x="20" y="220" width="660" height="95" rx="8" fill="#F6E9D3" stroke="#C8862B" stroke-width="1.5"/>
+        <text x="40" y="244" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#8C5E13">ARCHETYPE 3 — The TRANSACTION</text>
+        <text x="40" y="264" font-family="Space Grotesk" font-size="11.5" fill="#8C5E13">What happens when Actor interacts with Resource?</text>
+        <text x="40" y="284" font-family="IBM Plex Mono" font-size="10.5" fill="#8C5E13">Examples: Booking, Payment, Ticket, Ride, Order</text>
+        <text x="40" y="302" font-family="IBM Plex Mono" font-size="10.5" fill="#8C5E13">Always has: id, timestamp, actorRef, resourceRef, status</text>
+
+        <rect x="20" y="325" width="660" height="95" rx="8" fill="#EAE2F7" stroke="#7A54C9" stroke-width="1.5"/>
+        <text x="40" y="349" font-family="Space Grotesk" font-size="13" font-weight="700" fill="#4E3080">ARCHETYPE 4 — The COORDINATOR / MANAGER</text>
+        <text x="40" y="369" font-family="Space Grotesk" font-size="11.5" fill="#4E3080">What orchestrates the system? (Often a Singleton)</text>
+        <text x="40" y="389" font-family="IBM Plex Mono" font-size="10.5" fill="#4E3080">Examples: ParkingLot, Library, VendingMachine, ElevatorController</text>
+        <text x="40" y="407" font-family="IBM Plex Mono" font-size="10.5" fill="#4E3080">Always has: collection of Resources, business rules, state mgmt</text>
+
+        <path d="M700,58 L700,60" stroke="none"/>
+      </svg>
+      <figcaption>The Coordinator usually references a collection of Resources and creates Transactions when an Actor acts — the four archetypes aren't independent, they interlock.</figcaption>
+    </figure>
+
+    <h3>Step 3 — Relationship Identification</h3>
+    <p>After finding entities, ask these three questions for every pair.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>1. Has-A or Is-A?</h4>
+        <ul>
+          <li><code>ParkingLot</code> has <code>ParkingFloor</code>s → Composition</li>
+          <li><code>Car</code> is-a <code>Vehicle</code> → Inheritance</li>
+          <li><code>Booking</code> has-a reference to <code>User</code> → Association</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>2. Multiplicity?</h4>
+        <ul>
+          <li>One ParkingLot → Many ParkingFloors (1:N)</li>
+          <li>One User → Many Bookings (1:N)</li>
+          <li>One Show → Many Seats (1:N)</li>
+          <li>One Booking → One Seat (1:1)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>3. Lifecycle dependency</h4>
+    <p>If the parent dies, does the child die too? → <strong>Composition</strong> (strong). Can the child exist independently? → <strong>Aggregation</strong> (weak).</p>
+
+    <h3>Step 4 — The "What Varies?" Question</h3>
+    <p>This is how you identify where design patterns are actually needed — not by memorizing pattern names, but by asking what's likely to change.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="varies-title">
+        <title id="varies-title">What varies maps directly to which pattern</title>
+        <rect x="20" y="10" width="300" height="34" rx="6" fill="#fff" stroke="#181C22"/>
+        <text x="170" y="32" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#181C22">"What might change or vary?"</text>
+        <defs><marker id="v1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <path d="M170,44 L170,58" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="55" fill="#565F6B">FEE CALCULATION varies?</text>
+          <rect x="450" y="42" width="220" height="26" rx="5" fill="#DDEFE4" stroke="#2F8F63"/>
+          <text x="560" y="60" text-anchor="middle" fill="#1F6B47">Strategy Pattern</text>
+
+          <path d="M170,74 L170,88" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="85" fill="#565F6B">OBJECT CREATION varies?</text>
+          <rect x="450" y="72" width="220" height="26" rx="5" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="560" y="90" text-anchor="middle" fill="#1F3A93">Factory / Abstract Factory</text>
+
+          <path d="M170,104 L170,118" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="115" fill="#565F6B">NOTIFICATION mechanism varies?</text>
+          <rect x="450" y="102" width="220" height="26" rx="5" fill="#F6E9D3" stroke="#C8862B"/>
+          <text x="560" y="120" text-anchor="middle" fill="#8C5E13">Observer Pattern</text>
+
+          <path d="M170,134 L170,148" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="145" fill="#565F6B">OBJECT STATE changes significantly?</text>
+          <rect x="450" y="132" width="220" height="26" rx="5" fill="#F7E4E3" stroke="#C7454A"/>
+          <text x="560" y="150" text-anchor="middle" fill="#8E2E32">State Pattern</text>
+
+          <path d="M170,164 L170,178" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="175" fill="#565F6B">Only ONE instance should exist?</text>
+          <rect x="450" y="162" width="220" height="26" rx="5" fill="#EAE2F7" stroke="#7A54C9"/>
+          <text x="560" y="180" text-anchor="middle" fill="#4E3080">Singleton</text>
+
+          <path d="M170,194 L170,208" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="205" fill="#565F6B">ADD behavior dynamically?</text>
+          <rect x="450" y="192" width="220" height="26" rx="5" fill="#DDEFE4" stroke="#2F8F63"/>
+          <text x="560" y="210" text-anchor="middle" fill="#1F6B47">Decorator</text>
+
+          <path d="M170,224 L170,238" stroke="#565F6B" stroke-width="1.3" marker-end="url(#v1)"/>
+          <text x="180" y="235" fill="#565F6B">DECOUPLE complex subsystems?</text>
+          <rect x="450" y="222" width="220" height="26" rx="5" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="560" y="240" text-anchor="middle" fill="#1F3A93">Facade</text>
+        </g>
+      </svg>
+      <figcaption>Every pattern in Step 8 traces back to one of these questions — the pattern is the answer, "what varies" is the question you ask to find it.</figcaption>
+    </figure>
+
+
+    <h2 id="step2"><span class="modebadge">02</span>Draw Class Diagram <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">3–4 min</span></h2>
+    <div class="say-it"><em>"Let me model the core entities and their relationships."</em></div>
+
+    <h3>Class diagram notation — text format for use in an interview</h3>
+    <pre><code>+----------------------------+
+|       ClassName            |  &lt;- Concrete Class
++----------------------------+
+| - privateField: Type       |
+| # protectedField: Type     |
+| + publicField: Type        |
++----------------------------+
+| + publicMethod(): ReturnType|
+| - privateMethod(): void    |
+| + staticMethod(): Type     |
++----------------------------+
+
+&lt;&lt;interface&gt;&gt;
++----------------------------+
+|       InterfaceName        |
++----------------------------+
+| + method1(): void          |
+| + method2(): String        |
++----------------------------+
+
+&lt;&lt;abstract&gt;&gt;
++----------------------------+
+|    AbstractClassName       |
++----------------------------+
+| # sharedField: Type        |
++----------------------------+
+| + concreteMethod(): void   |
+| + abstractMethod(): void   |  &lt;- italicize or mark (abstract)
++----------------------------+</code></pre>
+
+    <h3>Rendered example — same notation as an actual diagram</h3>
+    <figure class="diagram">
+      <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cd-title">
+        <title id="cd-title">Interface, abstract class, and concrete class relationships</title>
+        <defs>
+          <marker id="cd-hollow" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#fff" stroke="#181C22" stroke-width="1"/></marker>
+        </defs>
+
+        <rect x="20" y="20" width="200" height="90" rx="4" fill="#EAE2F7" stroke="#7A54C9" stroke-width="1.5"/>
+        <text x="120" y="38" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" font-style="italic" fill="#4E3080">&lt;&lt;interface&gt;&gt;</text>
+        <text x="120" y="56" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#4E3080">PaymentStrategy</text>
+        <line x1="20" y1="64" x2="220" y2="64" stroke="#7A54C9"/>
+        <text x="32" y="80" font-family="IBM Plex Mono" font-size="10" fill="#4E3080">+ pay(amount): void</text>
+        <text x="32" y="96" font-family="IBM Plex Mono" font-size="10" fill="#4E3080">+ getMode(): String</text>
+
+        <rect x="20" y="200" width="200" height="90" rx="4" fill="#fff" stroke="#181C22" stroke-width="1.5"/>
+        <text x="120" y="220" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#181C22">CreditCardPayment</text>
+        <line x1="20" y1="228" x2="220" y2="228" stroke="#181C22"/>
+        <text x="32" y="244" font-family="IBM Plex Mono" font-size="10" fill="#181C22">- cardNumber: String</text>
+        <text x="32" y="260" font-family="IBM Plex Mono" font-size="10" fill="#181C22">+ pay(amount): void</text>
+        <text x="32" y="276" font-family="IBM Plex Mono" font-size="10" fill="#181C22">+ getMode(): String</text>
+        <path d="M120,200 L120,120" stroke="#181C22" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#cd-hollow)"/>
+        <text x="128" y="160" font-family="Space Grotesk" font-size="10" fill="#565F6B">implements</text>
+
+        <rect x="440" y="20" width="220" height="110" rx="4" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="550" y="38" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" font-style="italic" fill="#1F6B47">&lt;&lt;abstract&gt;&gt;</text>
+        <text x="550" y="56" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#1F6B47">Notification</text>
+        <line x1="440" y1="64" x2="660" y2="64" stroke="#2F8F63"/>
+        <text x="452" y="80" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47"># senderId: String</text>
+        <text x="452" y="96" font-family="IBM Plex Mono" font-size="10" fill="#1F6B47">+ log(): void</text>
+        <text x="452" y="112" font-family="IBM Plex Mono" font-size="10" font-style="italic" fill="#1F6B47">+ send(msg): void  (abstract)</text>
+
+        <rect x="440" y="230" width="220" height="80" rx="4" fill="#fff" stroke="#181C22" stroke-width="1.5"/>
+        <text x="550" y="250" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#181C22">EmailNotification</text>
+        <line x1="440" y1="258" x2="660" y2="258" stroke="#181C22"/>
+        <text x="452" y="274" font-family="IBM Plex Mono" font-size="10" fill="#181C22">+ send(msg): void</text>
+        <text x="452" y="290" font-family="IBM Plex Mono" font-size="10" fill="#181C22">+ getInbox(): String</text>
+        <path d="M550,230 L550,130" stroke="#181C22" stroke-width="1.3" marker-end="url(#cd-hollow)"/>
+        <text x="558" y="180" font-family="Space Grotesk" font-size="10" fill="#565F6B">extends</text>
+
+        <rect x="260" y="350" width="200" height="56" rx="4" fill="#fff" stroke="#181C22" stroke-width="1.5"/>
+        <text x="360" y="370" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#181C22">OrderService</text>
+        <line x1="260" y1="378" x2="460" y2="378" stroke="#181C22"/>
+        <text x="272" y="394" font-family="IBM Plex Mono" font-size="10" fill="#181C22">- paymentStrategy: PaymentStrategy</text>
+        <path d="M360,350 L150,110" stroke="#565F6B" stroke-width="1.3" marker-end="url(#cd-hollow)"/>
+        <text x="230" y="240" font-family="Space Grotesk" font-size="10" fill="#565F6B">has-a (association)</text>
+      </svg>
+      <figcaption>Dashed hollow arrow = implements an interface. Solid hollow arrow = extends a class. Solid thin arrow = association ("has-a" reference).</figcaption>
+    </figure>
+
+    <h3>Relationship notation — draw on whiteboard / write in text</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Relationship</th><th>Notation</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Association</td><td><code>A ────────&gt; B</code></td><td>A has a reference to B</td></tr>
+          <tr><td>Dependency</td><td><code>A - - - -&gt; B</code></td><td>A uses B temporarily</td></tr>
+          <tr><td>Aggregation</td><td><code>A &lt;&gt;───────&gt; B</code> (hollow diamond)</td><td>A has B, B can exist alone</td></tr>
+          <tr><td>Composition</td><td><code>A &lt;◆&gt;──────&gt; B</code> (filled diamond)</td><td>A owns B, B cannot exist alone</td></tr>
+          <tr><td>Inheritance</td><td><code>A ────────|&gt; B</code> (hollow arrow)</td><td>A extends B</td></tr>
+          <tr><td>Implementation</td><td><code>A - - - -|&gt; B</code> (dashed hollow arrow)</td><td>A implements B</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-title"><span class="dot b"></span>What to include in every class diagram</div>
+      For every class, interface, or abstract class, write out: fields with type and visibility (<code>+</code>, <code>-</code>, <code>#</code>); methods with parameters and return types; stereotypes like <code>&lt;&lt;interface&gt;&gt;</code>, <code>&lt;&lt;abstract&gt;&gt;</code>, <code>&lt;&lt;enum&gt;&gt;</code>, <code>&lt;&lt;singleton&gt;&gt;</code>; and mark static members explicitly (underline or the word <code>static</code>).
+    </div>
+
+    <h2 id="step3"><span class="modebadge">03</span>Draw Sequence Diagram <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">2–3 min, if asked or if flow is complex</span></h2>
+    <div class="say-it"><em>"Let me trace the flow for the primary use case."</em></div>
+
+    <h3>Sequence diagram notation — text format</h3>
+    <pre><code>Client          Controller                Service                Repository            External
+  |                 |                        |                        |                    |
+  |-- POST /api/v1/kyc ------------------->|                        |                    |
+  |   (Create KYC Request)                |                        |                    |
+  |                 |-- validate() ------>|                        |                    |
+  |                 |                     |-- GET /kyc/{id} ------>|                    |
+  |                 |                     |                        |-- query() -------->|
+  |                 |                     |                        |&lt;-- result ---------|
+  |                 |                     |&lt;-- entity -------------|                    |
+  |                 |                     |-- GET /external/user/{id} ----------------->|
+  |                 |                     |&lt;---------------------- external data -------|
+  |                 |                     |-- process()            |                    |
+  |                 |                     |-- PUT /kyc/{id} ------>|                    |
+  |                 |                     |                        |-- save() ----------|
+  |                 |&lt;-- response --------|                        |                    |
+  |&lt;-- 201 Created --|                    |                        |                    |</code></pre>
+
+    <h3>Rendered example — KYC request flow</h3>
+    <figure class="diagram">
+      <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="seq-title">
+        <title id="seq-title">Sequence diagram: KYC request across Client, Controller, Service, Repository, External</title>
+        <defs><marker id="seq1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#181C22"/></marker>
+        <marker id="seq2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+
+        <g font-family="Space Grotesk" font-size="11" font-weight="700" fill="#181C22">
+          <text x="40" y="20">Client</text>
+          <text x="180" y="20">Controller</text>
+          <text x="340" y="20">Service</text>
+          <text x="480" y="20">Repository</text>
+          <text x="620" y="20">External</text>
+        </g>
+        <g stroke="#D8DBD1" stroke-width="1.3">
+          <line x1="50" y1="30" x2="50" y2="320"/>
+          <line x1="200" y1="30" x2="200" y2="320"/>
+          <line x1="360" y1="30" x2="360" y2="320"/>
+          <line x1="510" y1="30" x2="510" y2="320"/>
+          <line x1="640" y1="30" x2="640" y2="320"/>
+        </g>
+
+        <path d="M50,50 L200,50" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="55" y="45" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">POST /api/v1/kyc</text>
+
+        <path d="M200,75 L360,75" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="205" y="70" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">validate()</text>
+
+        <path d="M360,100 L510,100" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="365" y="95" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">GET /kyc/{id}</text>
+        <path d="M510,120 L640,120" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="515" y="115" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">query()</text>
+        <path d="M640,140 L510,140" stroke="#565F6B" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#seq2)"/>
+        <text x="515" y="135" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">result</text>
+        <path d="M510,160 L360,160" stroke="#565F6B" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#seq2)"/>
+        <text x="365" y="155" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">entity</text>
+
+        <path d="M360,185 L640,185" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="365" y="180" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">GET /external/user/{id}</text>
+        <path d="M640,205 L360,205" stroke="#565F6B" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#seq2)"/>
+        <text x="365" y="200" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">external data</text>
+
+        <rect x="340" y="215" width="40" height="16" rx="3" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="360" y="227" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" fill="#8C5E13">process()</text>
+
+        <path d="M360,245 L510,245" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="365" y="240" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">PUT /kyc/{id}</text>
+        <path d="M510,262 L640,262" stroke="#181C22" stroke-width="1.4" marker-end="url(#seq1)"/>
+        <text x="515" y="257" font-family="IBM Plex Mono" font-size="9.5" fill="#181C22">save()</text>
+
+        <path d="M360,285 L200,285" stroke="#565F6B" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#seq2)"/>
+        <text x="205" y="280" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">response</text>
+        <path d="M200,305 L50,305" stroke="#565F6B" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#seq2)"/>
+        <text x="55" y="300" font-family="IBM Plex Mono" font-size="9" fill="#565F6B">201 Created</text>
+      </svg>
+      <figcaption>Solid arrows are calls; dashed arrows are returns. Left to right always follows Client → Controller → Service → Repository → External.</figcaption>
+    </figure>
+
+    <h3>Rules for the sequence diagram</h3>
+    <ul>
+      <li>Left to right: Client → Controller → Service → Repository → External</li>
+      <li>Show return arrows (dashed or explicitly labeled)</li>
+      <li>Show alternate flows with <code>[alt]</code> / <code>[opt]</code> blocks</li>
+      <li>Show loops with <code>[loop]</code> blocks</li>
+    </ul>
+
+    <pre><code>[alt: item found]
+  Service --> Repository: findById()
+  Repository --> Service: Item
+[else: item not found]
+  Service --> Client: throw ItemNotFoundException
+[end]
+
+[loop: for each item in cart]
+  Service --> PricingService: calculatePrice(item)
+[end]</code></pre>
+
+
+    <h2 id="step4"><span class="modebadge">04</span>Define Relationships <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">2 min</span></h2>
+    <div class="say-it"><em>"Let me define the relationships before writing code."</em></div>
+
+    <h3>Decision tree — what to use when</h3>
+    <figure class="diagram">
+      <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="rel-title">
+        <title id="rel-title">Relationship and pattern decision tree</title>
+        <defs><marker id="rel1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <text x="20" y="24" fill="#181C22" font-weight="700">Need shared CONTRACT across unrelated classes?</text>
+          <path d="M20,32 L20,44" stroke="#565F6B" marker-end="url(#rel1)"/>
+          <rect x="20" y="46" width="150" height="26" rx="5" fill="#EAE2F7" stroke="#7A54C9"/>
+          <text x="95" y="64" text-anchor="middle" fill="#4E3080">INTERFACE</text>
+          <text x="185" y="64" fill="#565F6B" font-size="9.5">e.g. Payable, Notifiable, Searchable</text>
+
+          <text x="20" y="98" fill="#181C22" font-weight="700">Need shared STATE + BEHAVIOR with variation?</text>
+          <path d="M20,106 L20,118" stroke="#565F6B" marker-end="url(#rel1)"/>
+          <rect x="20" y="120" width="180" height="26" rx="5" fill="#DDEFE4" stroke="#2F8F63"/>
+          <text x="110" y="138" text-anchor="middle" fill="#1F6B47">ABSTRACT CLASS</text>
+          <text x="210" y="138" fill="#565F6B" font-size="9.5">e.g. Vehicle, Employee, Shape</text>
+
+          <text x="20" y="172" fill="#181C22" font-weight="700">Need to REUSE behavior without IS-A relationship?</text>
+          <path d="M20,180 L20,192" stroke="#565F6B" marker-end="url(#rel1)"/>
+          <rect x="20" y="194" width="200" height="26" rx="5" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="120" y="212" text-anchor="middle" fill="#1F3A93">COMPOSITION (has-a)</text>
+          <text x="230" y="212" fill="#565F6B" font-size="9.5">e.g. OrderService has-a PaymentGateway</text>
+
+          <text x="20" y="246" fill="#181C22" font-weight="700">Need IS-A with full override?</text>
+          <path d="M20,254 L20,266" stroke="#565F6B" marker-end="url(#rel1)"/>
+          <rect x="20" y="268" width="220" height="26" rx="5" fill="#F6E9D3" stroke="#C8862B"/>
+          <text x="130" y="286" text-anchor="middle" fill="#8C5E13">INHERITANCE (extends)</text>
+          <text x="250" y="286" fill="#565F6B" font-size="9.5">e.g. CreditCard extends Card</text>
+        </g>
+      </svg>
+      <figcaption>Two more cases beyond this diagram: pluggable algorithms → Strategy Pattern; object creation without specifying the exact class → Factory Pattern.</figcaption>
+    </figure>
+
+    <h3>Senior-level phrases — relationships</h3>
+    <blockquote><p>"I use an <strong>interface</strong> here because multiple unrelated classes need this capability, allowing plug-and-play implementations."</p></blockquote>
+    <blockquote><p>"I use an <strong>abstract class</strong> because these entities share common state and behavior — the base handles the what, subclasses handle the how."</p></blockquote>
+    <blockquote><p>"I prefer <strong>composition over inheritance</strong> here to avoid tight coupling. If I inherit, I'm locked into a hierarchy. Composition gives me flexibility."</p></blockquote>
+    <blockquote><p>"This is a <strong>has-a</strong> relationship, not an <strong>is-a</strong>, so I compose rather than extend."</p></blockquote>
+
+    <h2 id="step5"><span class="modebadge">05</span>Folder Structure <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">1 min — say this before writing code</span></h2>
+    <div class="say-it"><em>"Let me lay out the package structure before writing any code."</em></div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="folder-title">
+        <title id="folder-title">Standard LLD package structure</title>
+        <g font-family="IBM Plex Mono" font-size="11.5" fill="#181C22">
+          <text x="20" y="24" font-weight="700">project-name/src/main/java/com/example/</text>
+          <text x="40" y="48" fill="#1F6B47">├── model/</text><text x="220" y="48" fill="#565F6B" font-size="10">Plain entities — fields, getters/setters, equals, hashCode</text>
+          <text x="40" y="70" fill="#8C5E13">├── enums/</text><text x="220" y="70" fill="#565F6B" font-size="10">Status, Type, Category enums</text>
+          <text x="40" y="92" fill="#4E3080">├── interfaces/</text><text x="220" y="92" fill="#565F6B" font-size="10">Capability contracts (Payable, Notifiable, ...)</text>
+          <text x="40" y="114" fill="#1F3A93">├── service/</text><text x="220" y="114" fill="#565F6B" font-size="10">Core business logic</text>
+          <text x="40" y="136" fill="#7A54C9">├── strategy/</text><text x="220" y="136" fill="#565F6B" font-size="10">Strategy pattern implementations</text>
+          <text x="40" y="158" fill="#C8862B">├── factory/</text><text x="220" y="158" fill="#565F6B" font-size="10">Factory / Abstract Factory classes</text>
+          <text x="40" y="180" fill="#2F8F63">├── observer/</text><text x="220" y="180" fill="#565F6B" font-size="10">Observer pattern — EventListener, EventPublisher</text>
+          <text x="40" y="202" fill="#C7454A">├── state/</text><text x="220" y="202" fill="#565F6B" font-size="10">State pattern — if lifecycle management is needed</text>
+          <text x="40" y="224" fill="#2C5FD1">├── repository/</text><text x="220" y="224" fill="#565F6B" font-size="10">In-memory storage — HashMap / ConcurrentHashMap</text>
+          <text x="40" y="246" fill="#181C22">├── controller/</text><text x="220" y="246" fill="#565F6B" font-size="10">Entry point — delegates to service</text>
+          <text x="40" y="268" fill="#8E2E32">├── exception/</text><text x="220" y="268" fill="#565F6B" font-size="10">Custom exception hierarchy</text>
+          <text x="40" y="290" fill="#181C22">└── Application.java</text><text x="260" y="290" fill="#565F6B" font-size="10">main(), demo, test scenarios</text>
+        </g>
+      </svg>
+      <figcaption>Say the structure out loud before writing a single class — it signals you're thinking in terms of separation of concerns, not improvising file-by-file.</figcaption>
+    </figure>
+
+
+    <h2 id="step6"><span class="modebadge">06</span>Write Core Code <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">5–8 min</span></h2>
+
+    <h3>Code comment style — mandatory</h3>
+    <p>Every non-trivial class or method needs a comment block naming the pattern, the reason for it, and the principle it satisfies:</p>
+    <pre><code>/*
+ * [Pattern/Principle]: Strategy Pattern
+ * [Why]: So we can swap pricing algorithms at runtime
+ *        without modifying OrderService.
+ * [Principle]: OCP -- Open for extension, closed for modification.
+ */</code></pre>
+
+    <h3>File template — every file must have this shape</h3>
+    <pre><code>package com.example.service;
+
+/**
+ * What it does: Processes orders end to end.
+ * Why it exists: Central coordination point -- keeps Controller thin.
+ * Pattern: Follows SRP -- only order processing logic here.
+ */
+public class OrderService {
+
+    // Fields -- explain why each exists
+    private final PaymentStrategy paymentStrategy;   // Strategy pattern -- pluggable payment
+    private final Map&lt;String, Order&gt; orderStore;     // ConcurrentHashMap for thread safety
+
+    // Constructor injection -- DIP: depend on abstraction, not concrete class
+    public OrderService(PaymentStrategy paymentStrategy) {
+        this.paymentStrategy = paymentStrategy;
+        this.orderStore = new ConcurrentHashMap&lt;&gt;();
+    }
+
+    public Order placeOrder(String userId, List&lt;Item&gt; items) {
+        // Step 1: Validate inputs
+        validateInput(userId, items);
+
+        // Step 2: Build order (Builder pattern if complex)
+        Order order = new Order(UUID.randomUUID().toString(), userId, items, OrderStatus.PENDING);
+
+        // Step 3: Process payment
+        paymentStrategy.pay(order.getTotalAmount());
+
+        // Step 4: Persist
+        orderStore.put(order.getId(), order);
+
+        return order;
+    }
+}</code></pre>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="placeorder-title">
+        <title id="placeorder-title">placeOrder's four internal steps</title>
+        <defs><marker id="po1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <g font-family="Space Grotesk" font-size="11" font-weight="600">
+          <rect x="10" y="40" width="140" height="50" rx="7" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="80" y="61" text-anchor="middle" fill="#1F3A93">1. Validate</text>
+          <text x="80" y="77" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#1F3A93">fail fast</text>
+
+          <rect x="185" y="40" width="140" height="50" rx="7" fill="#DDEFE4" stroke="#2F8F63"/>
+          <text x="255" y="61" text-anchor="middle" fill="#1F6B47">2. Build order</text>
+          <text x="255" y="77" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#1F6B47">Builder if complex</text>
+
+          <rect x="360" y="40" width="140" height="50" rx="7" fill="#F6E9D3" stroke="#C8862B"/>
+          <text x="430" y="61" text-anchor="middle" fill="#8C5E13">3. Process payment</text>
+          <text x="430" y="77" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8C5E13">via Strategy</text>
+
+          <rect x="535" y="40" width="140" height="50" rx="7" fill="#EAE2F7" stroke="#7A54C9"/>
+          <text x="605" y="61" text-anchor="middle" fill="#4E3080">4. Persist</text>
+          <text x="605" y="77" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#4E3080">ConcurrentHashMap</text>
+        </g>
+        <path d="M150,65 L185,65" stroke="#565F6B" stroke-width="1.3" marker-end="url(#po1)"/>
+        <path d="M325,65 L360,65" stroke="#565F6B" stroke-width="1.3" marker-end="url(#po1)"/>
+        <path d="M500,65 L535,65" stroke="#565F6B" stroke-width="1.3" marker-end="url(#po1)"/>
+      </svg>
+      <figcaption>Every service method that does real work should read as this kind of numbered, commented sequence — it's what lets an interviewer follow your code without asking.</figcaption>
+    </figure>
+
+    <h3>Model template</h3>
+    <pre><code>public class Order {
+    private final String id;          // immutable
+    private final String userId;
+    private List&lt;Item&gt; items;
+    private OrderStatus status;       // mutable -- lifecycle changes
+    private final LocalDateTime createdAt;
+
+    // Constructor, getters, equals(), hashCode(), toString()
+}</code></pre>
+
+    <h3>Enum template</h3>
+    <pre><code>public enum OrderStatus {
+    PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+}</code></pre>
+
+    <h3>Interface template</h3>
+    <pre><code>/*
+ * Capability contract -- any class that can process payments implements this.
+ * Allows swapping Credit, UPI, Wallet without touching OrderService.
+ */
+public interface PaymentStrategy {
+    void pay(double amount);
+    String getPaymentMode();
+}</code></pre>
+
+    <h3>Abstract class template</h3>
+    <pre><code>/*
+ * Abstract class -- all notification channels share senderId + timestamp logic.
+ * Subclasses only implement the channel-specific send().
+ */
+public abstract class Notification {
+    protected final String senderId;
+    protected final LocalDateTime timestamp;
+
+    protected Notification(String senderId) {
+        this.senderId = senderId;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    // Common behavior
+    public void log() {
+        System.out.println("[" + timestamp + "] Notification from " + senderId);
+    }
+
+    // Subclasses must implement
+    public abstract void send(String message);
+}</code></pre>
+
+    <h3>Custom exception hierarchy template</h3>
+    <pre><code>// Base exception -- callers can catch at right granularity
+public class AppException extends RuntimeException {
+    private final String errorCode;
+    public AppException(String errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+}
+
+public class ItemNotFoundException extends AppException {
+    public ItemNotFoundException(String itemId) {
+        super("ITEM_NOT_FOUND", "Item not found: " + itemId);
+    }
+}
+
+public class InsufficientBalanceException extends AppException {
+    public InsufficientBalanceException(double required, double available) {
+        super("INSUFFICIENT_BALANCE",
+              "Required: " + required + ", Available: " + available);
+    }
+}
+
+public class InvalidStateException extends AppException {
+    public InvalidStateException(String currentState, String operation) {
+        super("INVALID_STATE",
+              "Cannot perform " + operation + " in state: " + currentState);
+    }
+}</code></pre>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="exc-title">
+        <title id="exc-title">Custom exception hierarchy</title>
+        <defs><marker id="exc1" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#fff" stroke="#181C22" stroke-width="1"/></marker></defs>
+        <rect x="280" y="15" width="140" height="46" rx="6" fill="#F7E4E3" stroke="#C7454A" stroke-width="1.5"/>
+        <text x="350" y="35" text-anchor="middle" font-family="Space Grotesk" font-size="11" font-weight="700" fill="#8E2E32">AppException</text>
+        <text x="350" y="50" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8E2E32">extends RuntimeException</text>
+
+        <path d="M120,120 L280,50" stroke="#181C22" stroke-width="1.3" marker-end="url(#exc1)"/>
+        <path d="M350,120 L350,61" stroke="#181C22" stroke-width="1.3" marker-end="url(#exc1)"/>
+        <path d="M580,120 L420,50" stroke="#181C22" stroke-width="1.3" marker-end="url(#exc1)"/>
+
+        <rect x="30" y="122" width="180" height="44" rx="6" fill="#fff" stroke="#181C22"/>
+        <text x="120" y="148" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#181C22">ItemNotFoundException</text>
+        <rect x="260" y="122" width="180" height="44" rx="6" fill="#fff" stroke="#181C22"/>
+        <text x="350" y="148" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#181C22">InvalidStateException</text>
+        <rect x="490" y="122" width="190" height="44" rx="6" fill="#fff" stroke="#181C22"/>
+        <text x="585" y="148" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#181C22">InsufficientBalanceException</text>
+      </svg>
+      <figcaption>Every specific exception carries its own errorCode — callers can catch broadly at AppException or narrowly at the specific subtype, and logs always have a stable code to filter on.</figcaption>
+    </figure>
+
+
+    <h2 id="step7"><span class="modebadge">07</span>Concurrency <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">critical for Adobe / Kotak-style interviews</span></h2>
+    <div class="say-it"><em>"Since multiple requests can hit this simultaneously, let me ensure thread safety."</em></div>
+
+    <h3>Concurrency toolkit — when to use what</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Tool</th><th>When to use</th></tr></thead>
+        <tbody>
+          <tr><td><code>ConcurrentHashMap</code></td><td>Thread-safe map, no full lock needed</td></tr>
+          <tr><td><code>synchronized</code> block</td><td>Simple mutual exclusion on a small critical section</td></tr>
+          <tr><td><code>ReentrantLock</code></td><td>Need tryLock, fairness, or lock across methods</td></tr>
+          <tr><td><code>AtomicInteger</code> / <code>AtomicLong</code></td><td>Counter increments without synchronized</td></tr>
+          <tr><td><code>AtomicReference&lt;T&gt;</code></td><td>CAS on a single object reference</td></tr>
+          <tr><td><code>volatile</code></td><td>Single variable visibility across threads</td></tr>
+          <tr><td><code>ReadWriteLock</code></td><td>Read-heavy workload — multiple readers, exclusive writer</td></tr>
+          <tr><td><code>Semaphore</code></td><td>Limit concurrent access (e.g., max 10 concurrent bookings)</td></tr>
+          <tr><td><code>BlockingQueue</code></td><td>Producer-consumer pattern</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="conc-title">
+        <title id="conc-title">Concurrency tool decision tree</title>
+        <defs><marker id="conc1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <text x="20" y="24" fill="#181C22" font-weight="700">Thread-safe map?</text>
+          <rect x="180" y="12" width="170" height="24" rx="5" fill="#DDEFE4" stroke="#2F8F63"/>
+          <text x="265" y="28" text-anchor="middle" fill="#1F6B47">ConcurrentHashMap</text>
+
+          <text x="20" y="54" fill="#181C22" font-weight="700">Simple counter?</text>
+          <rect x="180" y="42" width="170" height="24" rx="5" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="265" y="58" text-anchor="middle" fill="#1F3A93">AtomicInteger</text>
+
+          <text x="20" y="84" fill="#181C22" font-weight="700">Lock with tryLock / fairness?</text>
+          <rect x="280" y="72" width="150" height="24" rx="5" fill="#F6E9D3" stroke="#C8862B"/>
+          <text x="355" y="88" text-anchor="middle" fill="#8C5E13">ReentrantLock</text>
+
+          <text x="20" y="114" fill="#181C22" font-weight="700">Read-heavy workload?</text>
+          <rect x="240" y="102" width="150" height="24" rx="5" fill="#EAE2F7" stroke="#7A54C9"/>
+          <text x="315" y="118" text-anchor="middle" fill="#4E3080">ReadWriteLock</text>
+
+          <text x="20" y="144" fill="#181C22" font-weight="700">Limit parallel access?</text>
+          <rect x="250" y="132" width="120" height="24" rx="5" fill="#F7E4E3" stroke="#C7454A"/>
+          <text x="310" y="148" text-anchor="middle" fill="#8E2E32">Semaphore</text>
+
+          <text x="20" y="174" fill="#181C22" font-weight="700">Producer-consumer?</text>
+          <rect x="230" y="162" width="150" height="24" rx="5" fill="#DDEFE4" stroke="#2F8F63"/>
+          <text x="305" y="178" text-anchor="middle" fill="#1F6B47">BlockingQueue</text>
+
+          <text x="20" y="204" fill="#181C22" font-weight="700">Prevent duplicate processing?</text>
+          <rect x="300" y="192" width="220" height="24" rx="5" fill="#DFE6F9" stroke="#2C5FD1"/>
+          <text x="410" y="208" text-anchor="middle" fill="#1F3A93">Idempotency key in ConcurrentHashMap</text>
+        </g>
+      </svg>
+      <figcaption>This is the "30-second rule" version — enough to answer instantly when an interviewer asks "why this tool and not that one."</figcaption>
+    </figure>
+
+    <h3>Code patterns</h3>
+    <pre><code>// CAS with AtomicInteger
+AtomicInteger seatCount = new AtomicInteger(100);
+boolean booked = seatCount.compareAndSet(currentVal, currentVal - 1);
+
+// Synchronized critical section
+public synchronized boolean bookSeat(String seatId) {
+    if (!availableSeats.contains(seatId)) throw new SeatUnavailableException(seatId);
+    availableSeats.remove(seatId);
+    bookedSeats.put(seatId, userId);
+    return true;
+}
+
+// ReentrantLock for fine-grained control
+private final ReentrantLock lock = new ReentrantLock();
+
+public void transfer(Account from, Account to, double amount) {
+    lock.lock();
+    try {
+        from.debit(amount);
+        to.credit(amount);
+    } finally {
+        lock.unlock();   // always in finally
+    }
+}
+
+// Idempotency check
+private final Set&lt;String&gt; processedRequestIds = ConcurrentHashMap.newKeySet();
+
+public void process(String requestId, Order order) {
+    if (!processedRequestIds.add(requestId)) {
+        return;  // duplicate -- already processed
+    }
+    // actual processing
+}</code></pre>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="lock-title">
+        <title id="lock-title">ReentrantLock transfer — why unlock belongs in finally</title>
+        <rect x="30" y="20" width="180" height="46" rx="7" fill="#fff" stroke="#181C22"/>
+        <text x="120" y="47" text-anchor="middle" font-family="Space Grotesk" font-size="11.5" fill="#181C22">lock.lock()</text>
+        <path d="M120,66 L120,96" stroke="#565F6B" stroke-width="1.3"/>
+        <rect x="30" y="98" width="180" height="46" rx="7" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="120" y="118" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#8C5E13">try { debit(); credit(); }</text>
+        <text x="120" y="134" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8E2E32">↑ if this throws...</text>
+
+        <path d="M210,121 L400,121" stroke="#C7454A" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="300" y="112" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#8E2E32">exception thrown mid-transfer</text>
+
+        <rect x="410" y="98" width="230" height="46" rx="7" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="525" y="118" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#1F6B47">finally { lock.unlock(); }</text>
+        <text x="525" y="134" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#1F6B47">runs regardless -- lock always released</text>
+
+        <text x="30" y="165" font-family="Space Grotesk" font-size="11" fill="#8E2E32">Without finally: an exception mid-transfer leaves the lock held forever — every other thread deadlocks waiting on it.</text>
+      </svg>
+      <figcaption>This is the single most common bug pattern interviewers probe for — always show <code>unlock()</code> inside <code>finally</code>, never just at the end of the method body.</figcaption>
+    </figure>
+
+    <h3>Senior-level phrases — concurrency</h3>
+    <blockquote><p>"I use ConcurrentHashMap instead of HashMap because multiple threads will read and write simultaneously — ConcurrentHashMap gives us segment-level locking without blocking the entire map."</p></blockquote>
+    <blockquote><p>"I use AtomicInteger with CAS here to avoid a synchronized block on the counter — it's lock-free and more performant under high contention."</p></blockquote>
+    <blockquote><p>"I add an idempotency check using a ConcurrentHashMap key set — if the same requestId comes twice, we return early without double-processing."</p></blockquote>
+
+
+    <h2 id="step8"><span class="modebadge">08</span>Design Patterns <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">use when needed</span></h2>
+    <p>Call out the pattern <strong>by name</strong> and explain <strong>why</strong> — naming it without justifying it reads as pattern-matching for its own sake, not engineering judgment.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Pattern</th><th>Use when</th><th>Senior phrase</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Strategy</strong></td><td>Multiple algorithms, interchangeable at runtime</td><td>"I use Strategy so I can swap logic without touching the service class."</td></tr>
+          <tr><td><strong>Factory</strong></td><td>Object creation logic is complex or varies</td><td>"I use Factory to centralize creation and hide the <code>new</code> keyword from callers."</td></tr>
+          <tr><td><strong>Builder</strong></td><td>Object has many optional fields</td><td>"Builder pattern prevents telescoping constructors and makes construction readable."</td></tr>
+          <tr><td><strong>Singleton</strong></td><td>Global config, registry, thread pool</td><td>"I use Singleton for the config manager — one instance, globally accessible."</td></tr>
+          <tr><td><strong>Observer</strong></td><td>Event notifications to multiple subscribers</td><td>"Observer decouples the event source from handlers — add/remove listeners without touching core logic."</td></tr>
+          <tr><td><strong>State</strong></td><td>Entity has lifecycle (PENDING → CONFIRMED → etc.)</td><td>"State pattern externalizes lifecycle transitions — each state knows what's allowed."</td></tr>
+          <tr><td><strong>Decorator</strong></td><td>Add behavior without modifying class</td><td>"Decorator wraps the base service and adds cross-cutting concerns like logging or rate-limiting."</td></tr>
+          <tr><td><strong>Template Method</strong></td><td>Algorithm skeleton, steps vary</td><td>"Template Method defines the flow in the abstract class — subclasses plug in the specifics."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>State Pattern template — common in LLD interviews</h3>
+    <pre><code>public interface OrderState {
+    void confirm(OrderContext ctx);
+    void ship(OrderContext ctx);
+    void cancel(OrderContext ctx);
+}
+
+public class PendingState implements OrderState {
+    public void confirm(OrderContext ctx) {
+        ctx.setState(new ConfirmedState());
+    }
+    public void ship(OrderContext ctx) {
+        throw new InvalidStateException("PENDING", "ship");
+    }
+    public void cancel(OrderContext ctx) {
+        ctx.setState(new CancelledState());
+    }
+}
+
+public class OrderContext {
+    private OrderState currentState = new PendingState();
+
+    public void setState(OrderState state) { this.currentState = state; }
+    public void confirm() { currentState.confirm(this); }
+    public void ship()    { currentState.ship(this); }
+    public void cancel()  { currentState.cancel(this); }
+}</code></pre>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="state-title">
+        <title id="state-title">Order lifecycle as the State pattern</title>
+        <defs><marker id="st1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+        <rect x="20" y="70" width="140" height="50" rx="8" fill="#F6E9D3" stroke="#C8862B" stroke-width="1.5"/>
+        <text x="90" y="100" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#8C5E13">PENDING</text>
+        <path d="M160,90 L280,90" stroke="#2F8F63" stroke-width="1.4" marker-end="url(#st1)"/>
+        <text x="220" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#1F6B47">confirm()</text>
+        <rect x="280" y="70" width="140" height="50" rx="8" fill="#DDEFE4" stroke="#2F8F63" stroke-width="1.5"/>
+        <text x="350" y="100" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#1F6B47">CONFIRMED</text>
+        <path d="M420,90 L540,90" stroke="#2C5FD1" stroke-width="1.4" marker-end="url(#st1)"/>
+        <text x="480" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#1F3A93">ship()</text>
+        <rect x="540" y="70" width="140" height="50" rx="8" fill="#DFE6F9" stroke="#2C5FD1" stroke-width="1.5"/>
+        <text x="610" y="100" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#1F3A93">SHIPPED</text>
+
+        <path d="M90,120 L90,160" stroke="#C7454A" stroke-width="1.4" marker-end="url(#st1)"/>
+        <text x="100" y="145" font-family="IBM Plex Mono" font-size="9.5" fill="#8E2E32">cancel()</text>
+        <rect x="20" y="162" width="140" height="34" rx="6" fill="#F7E4E3" stroke="#C7454A"/>
+        <text x="90" y="184" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#8E2E32">CANCELLED</text>
+
+        <path d="M350,120 L350,160" stroke="#C7454A" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#st1)"/>
+        <text x="360" y="145" font-family="IBM Plex Mono" font-size="9" fill="#8E2E32">ship() → throws!</text>
+        <text x="330" y="184" font-family="Space Grotesk" font-size="10" fill="#8E2E32">CONFIRMED can't skip to ship without... wait, it can. PENDING can't ship.</text>
+      </svg>
+      <figcaption>Each state class only implements the transitions valid from that state — calling <code>ship()</code> on a PendingState throws InvalidStateException rather than needing an if-chain somewhere else in the codebase.</figcaption>
+    </figure>
+
+    <h2 id="step9"><span class="modebadge">09</span>Design Principles (SOLID) <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">always mention at least 2</span></h2>
+    <div class="say-it"><em>"Let me call out the SOLID principles I'm applying."</em></div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Principle</th><th>What to say</th></tr></thead>
+        <tbody>
+          <tr><td><strong>SRP</strong></td><td>"Each class has one reason to change — OrderService only handles order logic, PaymentService only handles payment."</td></tr>
+          <tr><td><strong>OCP</strong></td><td>"I can add a new payment type by implementing PaymentStrategy — no existing code changes."</td></tr>
+          <tr><td><strong>LSP</strong></td><td>"Any subclass of Notification can replace the base without breaking behavior."</td></tr>
+          <tr><td><strong>ISP</strong></td><td>"I split the interface into Payable and Refundable — callers depend only on what they use."</td></tr>
+          <tr><td><strong>DIP</strong></td><td>"OrderService depends on PaymentStrategy interface, not CreditCardPayment — high-level modules don't depend on low-level."</td></tr>
+          <tr><td><strong>Composition over Inheritance</strong></td><td>"I compose OrderService with a PaymentStrategy rather than extending a base payment class."</td></tr>
+          <tr><td><strong>Encapsulation</strong></td><td>"All fields are private — state changes only through validated methods."</td></tr>
+          <tr><td><strong>Fail Fast</strong></td><td>"I validate at entry points so invalid state never propagates deep into the system."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="step10"><span class="modebadge">10</span>Edge Case Checklist <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">before finishing</span></h2>
+    <div class="say-it"><em>"Let me quickly validate the failure scenarios."</em></div>
+
+    <p>Go through this list out loud:</p>
+    <div class="tablewrap">
+      <table>
+        <tbody>
+          <tr><td>☐</td><td>Null inputs — null userId, null item list?</td></tr>
+          <tr><td>☐</td><td>Empty collections — empty cart, zero items?</td></tr>
+          <tr><td>☐</td><td>Negative / zero values — negative price, zero quantity?</td></tr>
+          <tr><td>☐</td><td>Duplicate requests — same order placed twice?</td></tr>
+          <tr><td>☐</td><td>Concurrent access — two threads booking same seat?</td></tr>
+          <tr><td>☐</td><td>Invalid state transition — shipping a cancelled order?</td></tr>
+          <tr><td>☐</td><td>Max limits exceeded — cart limit, rate limit, booking cap?</td></tr>
+          <tr><td>☐</td><td>External service failure — payment gateway down?</td></tr>
+          <tr><td>☐</td><td>Partial failure — one item fails, what happens to rest?</td></tr>
+          <tr><td>☐</td><td>Resource exhaustion — out of stock, no available rooms?</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  
+    <h2 id="step11"><span class="modebadge">11</span>Logging <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">add after core code</span></h2>
+    <div class="say-it"><em>"I'll add structured logging — no sensitive data."</em></div>
+
+    <pre><code>import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
+    public Order placeOrder(String userId, List&lt;Item&gt; items) {
+        String requestId = UUID.randomUUID().toString();
+        log.info("PlaceOrder started | requestId={} userId={} itemCount={}",
+                 requestId, userId, items.size());
+
+        try {
+            // ... logic ...
+            log.info("PlaceOrder success | requestId={} orderId={}", requestId, order.getId());
+            return order;
+        } catch (AppException e) {
+            log.error("PlaceOrder failed | requestId={} errorCode={} reason={}",
+                      requestId, e.getErrorCode(), e.getMessage());
+            throw e;
+        }
+        // NO: log.info("Card number: " + card.getNumber());  &lt;- never log sensitive data
+    }
+}</code></pre>
+
+    <div class="callout red">
+      <div class="callout-title"><span class="dot r"></span>Never log sensitive data</div>
+      Card numbers, passwords, tokens, and full PII never belong in a log line, structured or not — logs get shipped to aggregators, retained for months, and read by more people than the code itself. Log the <code>requestId</code> and enough context to trace the failure, never the payload that made the failure sensitive.
+    </div>
+
+    <h2 id="step12"><span class="modebadge">12</span>Scaling Discussion <span style="font-size:.55em; color:var(--ink-soft); font-weight:500; margin-left:10px;">if asked</span></h2>
+    <div class="say-it"><em>"If this needs to scale beyond a single JVM..."</em></div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="scale-title">
+        <title id="scale-title">Scaling beyond a single JVM</title>
+        <defs><marker id="sc1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#565F6B"/></marker></defs>
+
+        <rect x="270" y="10" width="160" height="40" rx="6" fill="#fff" stroke="#181C22"/>
+        <text x="350" y="34" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#181C22">Client Request</text>
+        <path d="M350,50 L350,72" stroke="#565F6B" stroke-width="1.4" marker-end="url(#sc1)"/>
+
+        <rect x="230" y="74" width="240" height="46" rx="6" fill="#EAE2F7" stroke="#7A54C9"/>
+        <text x="350" y="94" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#4E3080">API Gateway</text>
+        <text x="350" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#4E3080">Auth, Rate Limiting, SSL termination</text>
+        <path d="M350,120 L350,142" stroke="#565F6B" stroke-width="1.4" marker-end="url(#sc1)"/>
+
+        <rect x="230" y="144" width="240" height="46" rx="6" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="350" y="164" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#8C5E13">Load Balancer</text>
+        <text x="350" y="180" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#8C5E13">Round-robin / Least connections</text>
+        <path d="M350,190 L350,212" stroke="#565F6B" stroke-width="1.4" marker-end="url(#sc1)"/>
+
+        <rect x="230" y="214" width="240" height="46" rx="6" fill="#DDEFE4" stroke="#2F8F63"/>
+        <text x="350" y="234" text-anchor="middle" font-family="Space Grotesk" font-size="12" font-weight="700" fill="#1F6B47">Service Layer</text>
+        <text x="350" y="250" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#1F6B47">Stateless, horizontally scalable</text>
+
+        <path d="M270,260 L120,300" stroke="#565F6B" stroke-width="1.3" marker-end="url(#sc1)"/>
+        <rect x="20" y="302" width="200" height="46" rx="6" fill="#F7E4E3" stroke="#C7454A"/>
+        <text x="120" y="322" text-anchor="middle" font-family="Space Grotesk" font-size="11.5" font-weight="700" fill="#8E2E32">Cache Layer</text>
+        <text x="120" y="338" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8E2E32">Redis — hot data, sessions, idempotency keys</text>
+
+        <path d="M350,260 L350,300" stroke="#565F6B" stroke-width="1.3" marker-end="url(#sc1)"/>
+        <rect x="250" y="302" width="200" height="46" rx="6" fill="#DFE6F9" stroke="#2C5FD1"/>
+        <text x="350" y="322" text-anchor="middle" font-family="Space Grotesk" font-size="11.5" font-weight="700" fill="#1F3A93">Database</text>
+        <text x="350" y="338" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#1F3A93">Sharded/replicated — write primary, read replica</text>
+
+        <path d="M430,260 L580,300" stroke="#565F6B" stroke-width="1.3" marker-end="url(#sc1)"/>
+        <rect x="480" y="302" width="200" height="46" rx="6" fill="#F6E9D3" stroke="#C8862B"/>
+        <text x="580" y="322" text-anchor="middle" font-family="Space Grotesk" font-size="11.5" font-weight="700" fill="#8C5E13">Message Queue</text>
+        <text x="580" y="338" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8C5E13">Kafka — async notifications, analytics, audit</text>
+
+        <path d="M580,348 L580,380" stroke="#565F6B" stroke-width="1.3" marker-end="url(#sc1)"/>
+        <rect x="480" y="382" width="200" height="46" rx="6" fill="#EAE2F7" stroke="#7A54C9"/>
+        <text x="580" y="402" text-anchor="middle" font-family="Space Grotesk" font-size="11.5" font-weight="700" fill="#4E3080">Workers</text>
+        <text x="580" y="418" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#4E3080">Consumer groups, independent scaling</text>
+      </svg>
+      <figcaption>Notice the Service Layer only has three downstream dependencies drawn — cache, database, queue — because everything above it (gateway, load balancer) exists to get a request there safely, and everything below exists to let that layer stay stateless.</figcaption>
+    </figure>
+
+    <h2 id="cheatsheet">Quick-reference cheat sheet</h2>
+
+    <h3>Opening lines</h3>
+    <div class="cheat">
+      <table class="cheat-table">
+        <tbody>
+          <tr><th>Moment</th><th>What to say</th></tr>
+          <tr><td>Start</td><td>"Before implementation, let me clarify a few requirements."</td></tr>
+          <tr><td>Entities</td><td>"Let me identify core entities and model them."</td></tr>
+          <tr><td>Relationships</td><td>"Let me define relationships before writing any code."</td></tr>
+          <tr><td>Concurrency</td><td>"Since multiple requests can hit this simultaneously, I'll ensure thread safety using..."</td></tr>
+          <tr><td>Review</td><td>"Let me quickly validate the edge cases."</td></tr>
+          <tr><td>Refactor</td><td>"I'll start with a simple design and refactor using patterns if needed."</td></tr>
+          <tr><td>Scale</td><td>"If this needs to go beyond single JVM, I'd add caching and a queue layer."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Relationship decision — the 30-second rule</h3>
+    <div class="cheat">
+      <table class="cheat-table">
+        <tbody>
+          <tr><td>Shared contract, unrelated classes</td><td>Interface</td></tr>
+          <tr><td>Shared state + behavior, related</td><td>Abstract Class</td></tr>
+          <tr><td>Has-a, independent lifecycle</td><td>Aggregation (field reference)</td></tr>
+          <tr><td>Has-a, dependent lifecycle</td><td>Composition (create inside)</td></tr>
+          <tr><td>Pluggable algorithm</td><td>Strategy pattern</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Concurrency decision — the 30-second rule</h3>
+    <div class="cheat">
+      <table class="cheat-table">
+        <tbody>
+          <tr><td>Thread-safe map</td><td>ConcurrentHashMap</td></tr>
+          <tr><td>Simple counter</td><td>AtomicInteger</td></tr>
+          <tr><td>Lock with tryLock / fairness</td><td>ReentrantLock</td></tr>
+          <tr><td>Read-heavy</td><td>ReadWriteLock</td></tr>
+          <tr><td>Limit parallel access</td><td>Semaphore</td></tr>
+          <tr><td>Producer-consumer</td><td>BlockingQueue</td></tr>
+          <tr><td>Prevent duplicate processing</td><td>Idempotency key in ConcurrentHashMap</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-title"><span class="dot b"></span>End of Rulebook</div>
+      Run every step. Call out every step name. The structure is the signal — an interviewer watching you visibly move through requirements → entities → diagrams → relationships → folder structure → code → concurrency → patterns → SOLID → edge cases → logging → scaling is watching someone who has done this before, independent of whether the specific problem is one you've seen.
+    </div>
+  </article>
+</div>
+
+<hr class="rule" style="max-width:1180px; margin:0 auto;">
+
+<footer>
+  <p>This rulebook encodes a repeatable interview procedure, not a single correct answer — the exact class names and package layout will vary by problem, but the sequence of steps and the reasoning behind each tool choice should stay consistent across any LLD prompt.</p>
+</footer>
+
+<script>
+  const links = Array.from(document.querySelectorAll('.toc a'));
+  const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 100;
+    sections.forEach((s, i) => { if(s && s.offsetTop <= y) idx = i; });
+    links.forEach((a,i) => a.classList.toggle('active', i === idx));
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+</script>
+</body>
+</html>
